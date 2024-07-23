@@ -33,10 +33,10 @@ void run_bench() {
     std::uint64_t node_count = 0;
     TimePoint start = current_time();
     Position pos;
+    SearchInfo search_info;
     for(int i = 0; i < bench_positions.size(); i++) {
         std::string fen = "position fen " + bench_positions[i];
         std::vector<std::string> params = split_string(fen, ' ');
-        SearchInfo search_info;
         parse_position(pos, search_info, params);
         parse_go(pos, search_info, go_params);
         std::cout << "Position [" << i + 1 << "/" << bench_positions.size() << "]" << " (" << pos.fen() << ")" << std::endl;

@@ -16,13 +16,15 @@ struct SearchInfo {
 
     // Start time of the search.
     TimePoint start_time;
-    std::uint64_t max_time = std::numeric_limits<std::uint32_t>::max() / 2;
+    std::uint64_t max_time = std::numeric_limits<std::uint64_t>::max() / 2;
 
     // Current search depth.
     std::uint8_t depth = 0;
     std::uint8_t max_depth = 150;
 
     bool stop = false;
+
+    bool time_out() const { return stop || (max_time < time_elapsed(start_time)); }
 };
 
 void search(Position& pos, SearchInfo& search_info);

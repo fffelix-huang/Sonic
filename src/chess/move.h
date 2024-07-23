@@ -32,8 +32,10 @@ public:
 
 	// Returns the move in UCI format.
 	std::string to_string() const {
+		if(*this == Move::null_move()) {
+			return "(none)";
+		}
 		std::string res = from().to_string() + to().to_string();
-
 		switch(promotion()) {
 			case Promotion::None: return res;
 			case Promotion::Queen: return res + 'q';
@@ -41,7 +43,6 @@ public:
 			case Promotion::Bishop: return res + 'b';
 			case Promotion::Knight: return res + 'n';
 		}
-	
 		assert(false);
 	}
 

@@ -122,6 +122,7 @@ void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::str
         // go infinite
         time = std::numeric_limits<int>::max() / 2;
     }
+    search_info.nodes = 0;
     search_info.start_time = current_time();
     search_info.max_time = time / 20 + increment / 2;
     search_info.stop = false;
