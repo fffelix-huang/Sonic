@@ -19,36 +19,33 @@ void uci_loop(Position& pos, SearchInfo& search_info) {
     std::cout << "Sonic Chess Engine, written by Ting-Hsuan Huang" << std::endl;
     std::string cmd;
     while(std::getline(std::cin, cmd)) {
+        if(cmd == "") {
+            continue;
+        }
         std::vector<std::string> tokens = split_string(cmd, ' ');
         if(tokens[0] == "quit") {
             std::exit(0);
-        }
-        if(tokens[0] == "uci") {
+        } else if(tokens[0] == "uci") {
             std::cout << "id name Sonic" << std::endl;
             std::cout << "id author Ting-Hsuan Huang" << std::endl;
             std::cout << "uciok" << std::endl;
-        }
-        if(tokens[0] == "isready") {
+        } else if(tokens[0] == "isready") {
             std::cout << "readyok" << std::endl;
-        }
-        if(tokens[0] == "ucinewgame") {
+        } else if(tokens[0] == "ucinewgame") {
             pos.set(INITIAL_FEN);
-        }
-        if(tokens[0] == "bench") {
+        } else if(tokens[0] == "bench") {
             run_bench();
-        }
-        if(tokens[0] == "position") {
+        } else if(tokens[0] == "position") {
             parse_position(pos, search_info, tokens);
-        }
-        if(tokens[0] == "go") {
+        } else if(tokens[0] == "go") {
             parse_go(pos, search_info, tokens);
             search(pos, search_info);
-        }
-        if(tokens[0] == "stop") {
+        } else if(tokens[0] == "stop") {
             search_info.stop = true;
-        }
-        if(tokens[0] == "d") {
+        } else if(tokens[0] == "d") {
             std::cout << pos.to_string() << std::endl;
+        } else {
+            std::cout << "Unknown Command: " << cmd << std::endl;
         }
     }
 }
