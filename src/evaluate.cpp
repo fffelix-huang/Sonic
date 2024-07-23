@@ -5,7 +5,8 @@
 
 namespace sonic {
 
-int evaluate(Position& pos) {
+int evaluate(const Position& pos) {
+    Color us = pos.side_to_move();
     static constexpr int PieceValues[] = {100, 300, 300, 500, 900};
     int white_score = 0;
     int black_score = 0;
@@ -15,7 +16,7 @@ int evaluate(Position& pos) {
         black_score += popcount(pos.pieces(Color::BLACK, pt).to_int()) * PieceValues[i];
         i++;
     }
-    return pos.side_to_move() == Color::WHITE ? white_score - black_score : black_score - white_score;
+    return us == Color::WHITE ? white_score - black_score : black_score - white_score;
 }
 
 } // namespace sonic

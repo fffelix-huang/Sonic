@@ -27,6 +27,6 @@ struct SearchInfo {
     bool time_out() const { return stop || (max_time < time_elapsed(start_time)); }
 };
 
-void search(Position& pos, SearchInfo& search_info);
+void search(const Position& pos, SearchInfo& search_info);
 
 } // namespace sonic

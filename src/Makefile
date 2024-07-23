@@ -13,7 +13,7 @@ OBJS = main.o bench/benchmark.o chess/attacks.o chess/movegen.o chess/position.o
 all: $(EXE)
 
 clean: 
-	$(RM) $(EXE) *.o chess/*.o utils/*.o
+	$(RM) $(EXE) *.o bench/*.o chess/*.o utils/*.o
 
 ###
 ### Compiler:

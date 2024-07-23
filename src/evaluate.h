@@ -4,6 +4,6 @@
 
 namespace sonic {
 
-int evaluate(Position& pos);
+int evaluate(const Position& pos);
 
 } // namespace sonic

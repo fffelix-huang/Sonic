@@ -35,6 +35,10 @@ public:
         return Square(lsb(raw));
     }
 
+    bool in_check() const {
+        return attacks_by(king_square(sideToMove), other_color(sideToMove));
+    }
+
     constexpr Bitboard pieces(Color c) const {
         return pieceBB[c][PieceType::PAWN] | pieceBB[c][PieceType::KNIGHT]
                | pieceBB[c][PieceType::BISHOP] | pieceBB[c][PieceType::ROOK]

@@ -10,20 +10,39 @@
 namespace sonic {
 
 // Negamax search with alpha-beta pruning.
-int negamax(Position& pos, SearchInfo& search_info, int alpha, int beta, int depth, Move& best_move) {
-    search_info.nodes++;
-    if(depth == 0 || search_info.time_out()) {
+int negamax(const Position& pos, SearchInfo& search_info, int alpha, int beta, int depth, Move& move) {
+    if(depth <= 0 || search_info.time_out()) {
         return evaluate(pos);
+    }
+    search_info.nodes++;
+    // Perform search on the best move from previous search first.
+    if(move != Move::null_move()) {
+        Position new_pos(pos);
+        assert(new_pos.make_move(move));
+        Move tmp = Move::null_move();
+        int score = -negamax(new_pos, search_info, -beta, -alpha, depth - 1, tmp);
+        if(score > alpha) {
+            alpha = score;
+            if(alpha >= beta) {
+                return alpha;
+            }
+        }
     }
     MoveList movelist;
     generate_moves<GenType::ALL>(pos, movelist);
-    best_move = Move::null_move();
+    Move best_move = move;
+    int legal_moves = 0;
     for(Move m : movelist) {
+        if(m == move) {
+            legal_moves++;
+            continue;
+        }
         Position new_pos(pos);
         if(!new_pos.make_move(m)) {
             continue;
         }
-        Move tmp;
+        legal_moves++;
+        Move tmp = Move::null_move();
         int score = -negamax(new_pos, search_info, -beta, -alpha, depth - 1, tmp);
         if(score > alpha) {
             alpha = score;
@@ -33,10 +52,15 @@ int negamax(Position& pos, SearchInfo& search_info, int alpha, int beta, int dep
             }
         }
     }
+    if(legal_moves == 0) {
+        // Checkmate or Stalemate.
+        return pos.in_check() ? std::numeric_limits<int>::min() / 2 : 0;
+    }
+    move = best_move;
     return alpha;
 }
 
-void search(Position& pos, SearchInfo& search_info) {
+void search(const Position& pos, SearchInfo& search_info) {
     // Iterative deepening
     Move best_move = Move::null_move();
     for(int depth = 1; depth <= search_info.max_depth; depth++) {
@@ -45,7 +69,8 @@ void search(Position& pos, SearchInfo& search_info) {
         std::cout << "info depth " << depth << " seldepth " << depth;
         std::cout << " score cp " << score << " nodes " << search_info.nodes;
         std::cout << " nps " << (search_info.nodes * 1000) / (ms + 1);
-        std::cout << " time " << ms << std::endl;
+        std::cout << " time " << ms;
+        std::cout << " pv " << best_move.to_string() << std::endl;
         if(search_info.time_out()) {
             break;
         }
