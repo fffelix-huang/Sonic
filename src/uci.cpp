@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 
+#include "bench/benchmark.h"
 #include "chess/all.h"
 #include "utils/strings.h"
 #include "utils/timer.h"
@@ -33,11 +34,15 @@ void uci_loop(Position& pos, SearchInfo& search_info) {
         if(tokens[0] == "ucinewgame") {
             pos.set(INITIAL_FEN);
         }
+        if(tokens[0] == "bench") {
+            run_bench();
+        }
         if(tokens[0] == "position") {
             parse_position(pos, search_info, tokens);
         }
         if(tokens[0] == "go") {
             parse_go(pos, search_info, tokens);
+            search(pos, search_info);
         }
         if(tokens[0] == "stop") {
             search_info.stop = true;
@@ -120,7 +125,6 @@ void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::str
     search_info.start_time = current_time();
     search_info.max_time = time / 20 + increment / 2;
     search_info.stop = false;
-    search(pos, search_info);
 }
 
 } // namespace sonic

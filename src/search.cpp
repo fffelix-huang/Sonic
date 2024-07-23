@@ -43,9 +43,6 @@ void search(Position& pos, SearchInfo& search_info) {
         std::cout << " score cp " << score << " nodes " << search_info.nodes;
         std::cout << " nps " << (search_info.nodes * 1000) / (ms + 1);
         std::cout << " time " << ms << std::endl;
-        if(search_info.max_time > ms) {
-            break;
-        }
     }
     std::cout << "bestmove " << best_move.to_string() << std::endl;
 }
