@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "../chess/all.h"
+#include "../utils/timer.h"
 
 namespace sonic {
 
@@ -50,10 +51,9 @@ void bench_perft() {
         const auto& test = perft_tests[i];
         Position pos(test.fen);
 
-        const auto start = std::chrono::high_resolution_clock::now();
+        TimePoint start = current_time();
         std::uint64_t node_count = perft(pos, test.depth);
-        const auto end = std::chrono::high_resolution_clock::now();
-        const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::uint64_t ms = time_elapsed(start);
 
         std::cout << "Position [" << i + 1 << "/" << perft_tests.size() << "]:";
         std::cout << std::left;

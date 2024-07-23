@@ -4,7 +4,7 @@
 
 EXE = sonic
 
-OBJS = main.o chess/attacks.o chess/movegen.o chess/position.o utils/strings.o uci.o search.o
+OBJS = main.o chess/attacks.o chess/movegen.o chess/position.o utils/strings.o uci.o search.o evaluate.o
 
 ###
 ### Rules

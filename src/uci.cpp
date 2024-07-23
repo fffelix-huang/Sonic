@@ -9,6 +9,7 @@
 
 #include "chess/all.h"
 #include "utils/strings.h"
+#include "utils/timer.h"
 #include "search.h"
 
 namespace sonic {
@@ -89,7 +90,6 @@ void parse_position(Position& pos, SearchInfo& search_info, const std::vector<st
 }
 
 void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::string>& params) {
-    search_info.start_time = std::chrono::steady_clock::now();
     const Color& us = pos.side_to_move();
     int time = -1, increment = 0;
     for(int i = 1; i < params.size(); i++) {
@@ -110,15 +110,17 @@ void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::str
             search_info.max_nodes = stoi(params[i]);
         } else if(params[i] == "depth") {
             i++;
-            search_info.max_nodes = stoi(params[i]);
+            search_info.max_depth = stoi(params[i]);
         }
     }
     if(time == -1) {
         // go infinite
         time = std::numeric_limits<int>::max() / 2;
     }
+    search_info.start_time = current_time();
     search_info.max_time = time / 20 + increment / 2;
     search_info.stop = false;
+    search(pos, search_info);
 }
 
 } // namespace sonic
