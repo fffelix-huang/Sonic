@@ -6,6 +6,7 @@
 #include "chess/all.h"
 #include "utils/timer.h"
 #include "evaluate.h"
+#include "movesort.h"
 
 namespace sonic {
 
@@ -30,6 +31,7 @@ int negamax(const Position& pos, SearchInfo& search_info, int alpha, int beta, i
     }
     MoveList movelist;
     generate_moves<GenType::ALL>(pos, movelist);
+    sort_moves(pos, movelist);
     Move best_move = move;
     int legal_moves = 0;
     for(Move m : movelist) {

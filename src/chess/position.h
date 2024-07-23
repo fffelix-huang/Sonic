@@ -39,6 +39,11 @@ public:
         return attacks_by(king_square(sideToMove), other_color(sideToMove));
     }
 
+    bool is_capture(Move m) const {
+        const Square& to = m.to();
+        return piece_on(to) != Piece::NO_PIECE || to == enPassant;
+    }
+
     constexpr Bitboard pieces(Color c) const {
         return pieceBB[c][PieceType::PAWN] | pieceBB[c][PieceType::KNIGHT]
                | pieceBB[c][PieceType::BISHOP] | pieceBB[c][PieceType::ROOK]
