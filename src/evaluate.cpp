@@ -137,16 +137,20 @@ int evaluate(const Position& pos) {
     int mid_game_score = 0;
     int end_game_score = 0;
     int phase = 0;
-    for(Square sq : pos.pieces(Color::WHITE)) {
-        PieceType pt = type(pos.piece_on(sq));
-        mid_game_score += MiddleGamePieceSquareTable[pt][sq.to_int()];
-        end_game_score += EndGamePieceSquareTable[pt][sq.to_int()];
-        if(pt != PieceType::KING) {
-            phase += PieceTypeValues[pt];
+    int coeff = 1;
+    for(Color c : {Color::WHITE, Color::BLACK}) {
+        for(Square sq : pos.pieces(c)) {
+            PieceType pt = type(pos.piece_on(sq));
+            mid_game_score += coeff * MiddleGamePieceSquareTable[pt][sq.to_int()];
+            end_game_score += coeff * EndGamePieceSquareTable[pt][sq.to_int()];
+            if(pt != PieceType::KING) {
+                phase += PieceTypeValues[pt];
+            }
         }
+        coeff *= -1;
     }
-    int score = mid_game_score * phase + end_game_score * (48 - phase);
-    score /= 12288;
+    int score = mid_game_score * phase + end_game_score * (78 - phase);
+    score /= 19968;
     return us == Color::WHITE ? score : -score;
 }
 
