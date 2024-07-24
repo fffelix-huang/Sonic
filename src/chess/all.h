@@ -9,3 +9,4 @@
 #include "movegen.h"
 #include "piece.h"
 #include "position.h"
+#include "zobrist.h"

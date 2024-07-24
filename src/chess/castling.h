@@ -30,31 +30,31 @@ public:
 
 	Castling() = default;
 
-	void set_00(Color c) { data |= (c == Color::WHITE ? 1 : 4); }
-	void set_000(Color c) { data |= (c == Color::WHITE ? 2 : 8); }
-	void set_white_00() { set_00(Color::WHITE); }
-	void set_white_000() { set_000(Color::WHITE); }
-	void set_black_00() { set_00(Color::BLACK); }
-	void set_black_000() { set_000(Color::BLACK); }
-    void set_all() { data = 15; }
+	constexpr void set_00(Color c) { data |= (c == Color::WHITE ? 1 : 4); }
+	constexpr void set_000(Color c) { data |= (c == Color::WHITE ? 2 : 8); }
+	constexpr void set_white_00() { set_00(Color::WHITE); }
+	constexpr void set_white_000() { set_000(Color::WHITE); }
+	constexpr void set_black_00() { set_00(Color::BLACK); }
+	constexpr void set_black_000() { set_000(Color::BLACK); }
+	constexpr void set_all() { data = 15; }
 
-	void reset_00(Color c) { data &= ~(c == Color::WHITE ? 1 : 4); }
-	void reset_000(Color c) { data &= ~(c == Color::WHITE ? 2 : 8); }
-	void reset_white_00()  { reset_00(Color::WHITE); }
-	void reset_white_000() { reset_000(Color::WHITE); }
-	void reset_black_00()  { reset_00(Color::BLACK); }
-	void reset_black_000() { reset_000(Color::BLACK); }
-    void reset_all() { data = 0; }
+	constexpr void reset_00(Color c) { data &= ~(c == Color::WHITE ? 1 : 4); }
+	constexpr void reset_000(Color c) { data &= ~(c == Color::WHITE ? 2 : 8); }
+	constexpr void reset_white_00()  { reset_00(Color::WHITE); }
+	constexpr void reset_white_000() { reset_000(Color::WHITE); }
+	constexpr void reset_black_00()  { reset_00(Color::BLACK); }
+	constexpr void reset_black_000() { reset_000(Color::BLACK); }
+	constexpr void reset_all() { data = 0; }
 
-	bool can_00(Color c) const { return (data >> (c == Color::WHITE ? 0 : 2)) & 1; }
-	bool can_000(Color c) const { return (data >> (c == Color::WHITE ? 1 : 3)) & 1; }
-	bool white_can_00()  const { return can_00(Color::WHITE); }
-	bool white_can_000() const { return can_000(Color::WHITE); }
-	bool black_can_00()  const { return can_00(Color::BLACK); }
-	bool black_can_000() const { return can_000(Color::BLACK); }
+	constexpr bool can_00(Color c) const { return (data >> (c == Color::WHITE ? 0 : 2)) & 1; }
+	constexpr bool can_000(Color c) const { return (data >> (c == Color::WHITE ? 1 : 3)) & 1; }
+	constexpr bool white_can_00()  const { return can_00(Color::WHITE); }
+	constexpr bool white_can_000() const { return can_000(Color::WHITE); }
+	constexpr bool black_can_00()  const { return can_00(Color::BLACK); }
+	constexpr bool black_can_000() const { return can_000(Color::BLACK); }
 
-	bool any() const { return data != 0; }
-	bool any(Color c) const { return (data & (c == Color::WHITE ? 3 : 12)) != 0; }
+	constexpr bool any() const { return data != 0; }
+	constexpr bool any(Color c) const { return (data & (c == Color::WHITE ? 3 : 12)) != 0; }
 
     std::string to_string() const {
         if(!any()) {

@@ -11,6 +11,7 @@
 #include "consts.h"
 #include "move.h"
 #include "piece.h"
+#include "zobrist.h"
 
 namespace sonic {
 
@@ -20,6 +21,7 @@ struct UndoInfo {
     Square en_passant;
     Piece captured_piece;
     int rule50;
+    std::uint64_t key;
 };
 
 class Position {
@@ -31,6 +33,9 @@ public:
 
     // Returns the FEN representation of the position as a string.
     std::string fen() const;
+
+    // Returns the zobrist hash key of the current position.
+    constexpr std::uint64_t hashkey() const { return key; }
 
     constexpr Color side_to_move() const { return sideToMove; }
     constexpr Square en_passant() const { return enPassant; }
@@ -50,6 +55,21 @@ public:
     bool is_capture(Move m) const {
         const Square& to = m.to();
         return piece_on(to) != Piece::NO_PIECE || to == enPassant;
+    }
+
+    bool has_en_passant_capture() const {
+        if(enPassant == SQ_NONE) {
+            return false;
+        }
+        Piece my_pawn = (sideToMove == Color::WHITE ? Piece::W_PAWN : Piece::B_PAWN);
+        bool result = false;
+        if(enPassant.file() != File::FILE_A) {
+            result = result || piece_on(enPassant + Direction::WEST) == my_pawn;
+        }
+        if(enPassant.file() != File::FILE_H) {
+            result = result || piece_on(enPassant + Direction::EAST) == my_pawn;
+        }
+        return result;
     }
 
     constexpr Bitboard pieces(Color c) const {
@@ -92,6 +112,7 @@ private:
     void add_piece(Square sq, Piece p) {
         board[sq.to_int()] = p;
         pieceBB[color(p)][type(p)] += sq;
+        key ^= zobrist_key(sq, p);
     }
 
     void remove_piece(Square sq) {
@@ -99,6 +120,7 @@ private:
         if(p != Piece::NO_PIECE) {
             board[sq.to_int()] = Piece::NO_PIECE;
             pieceBB[color(p)][type(p)] -= sq;
+            key ^= zobrist_key(sq, p);
         }
     }
 
@@ -109,6 +131,7 @@ private:
     int rule50;
     Castling castlings;
     Square enPassant;
+    std::uint64_t key;
 };
 
 } // namespace sonic

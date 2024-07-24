@@ -1,6 +1,7 @@
 #include "position.h"
 
 #include <cassert>
+#include <iomanip>
 #include <vector>
 #include <sstream>
 #include <string>
@@ -13,12 +14,14 @@
 #include "consts.h"
 #include "move.h"
 #include "piece.h"
+#include "zobrist.h"
 
 namespace sonic {
 
 void Position::set(std::string fen) {
     std::vector<std::string> tokens = split_string(fen, ' ');
     assert(tokens.size() == 6);
+    key = 0;
 
     // 1. Piece placement
     clear_board();
@@ -54,6 +57,7 @@ void Position::set(std::string fen) {
 
     // 2. Active color
     sideToMove = (tokens[1] == "w" ? Color::WHITE : Color::BLACK);
+    key ^= zobrist_key(sideToMove);
 
     // 3. Castling rights
     castlings.reset_all();
@@ -68,9 +72,11 @@ void Position::set(std::string fen) {
             castlings.set_black_000();
         }
     }
+    key ^= zobrist_key(castlings);
 
     // 4. En passant square
     enPassant = (tokens[3] == "-" ? SQ_NONE : Square(tokens[3][1] - '1', tokens[3][0] - 'a'));
+    key ^= (has_en_passant_capture() * zobrist_key(enPassant));
 
     // 5-6. ply
     rule50 = std::stoi(tokens[4]);
@@ -152,9 +158,11 @@ bool Position::make_move(Move m, UndoInfo& info) {
     info.castling_state = castlings;
     info.en_passant = enPassant;
     info.captured_piece = Piece::NO_PIECE;
+    info.key = key;
 
     gamePly++;
     rule50++;
+    key ^= zobrist_key(castlings) ^ zobrist_key(sideToMove) ^ (has_en_passant_capture() * zobrist_key(enPassant));
 
     Color us = sideToMove;
     Color them = other_color(sideToMove);
@@ -252,6 +260,8 @@ bool Position::make_move(Move m, UndoInfo& info) {
         }
     }
 
+    key ^= zobrist_key(castlings) ^ zobrist_key(sideToMove) ^ (has_en_passant_capture() * zobrist_key(enPassant));
+
     return !attacks_by(king_square(us), them);
 }
 
@@ -301,6 +311,7 @@ void Position::unmake_move(const UndoInfo& info) {
     castlings = info.castling_state;
     enPassant = info.en_passant;
     rule50 = info.rule50;
+    key = info.key;
     gamePly--;
     sideToMove = other_color(sideToMove);
 }
@@ -322,6 +333,7 @@ std::string Position::to_string() const {
     }
     os << "   a   b   c   d   e   f   g   h\n";
     os << "\nFen: " << fen();
+    os << "\nKey: " << std::setw(16) << std::setfill('0') << std::hex << std::uppercase << key;
     return os.str();
 }
 
