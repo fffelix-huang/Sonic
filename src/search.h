@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstdint>
 #include <limits>
+#include <thread>
 
 #include "chess/all.h"
 #include "utils/timer.h"

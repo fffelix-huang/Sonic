@@ -6,6 +6,7 @@
 #include <limits>
 #include <vector>
 #include <string>
+#include <thread>
 
 #include "bench/benchmark.h"
 #include "chess/all.h"
@@ -18,6 +19,7 @@ namespace sonic {
 void uci_loop(Position& pos, SearchInfo& search_info) {
     std::cout << "Sonic Chess Engine, written by Ting-Hsuan Huang" << std::endl;
     std::string cmd;
+    std::thread th;
     while(std::getline(std::cin, cmd)) {
         if(cmd == "") {
             continue;
@@ -32,16 +34,25 @@ void uci_loop(Position& pos, SearchInfo& search_info) {
         } else if(tokens[0] == "isready") {
             std::cout << "readyok" << std::endl;
         } else if(tokens[0] == "ucinewgame") {
+            if(th.joinable()) {
+                th.join();
+            }
             pos.set(INITIAL_FEN);
         } else if(tokens[0] == "bench") {
             run_bench();
         } else if(tokens[0] == "position") {
             parse_position(pos, search_info, tokens);
         } else if(tokens[0] == "go") {
+            if(th.joinable()) {
+                th.join();
+            }
             parse_go(pos, search_info, tokens);
-            search(pos, search_info);
+            th = std::thread(search, std::ref(pos), std::ref(search_info));
         } else if(tokens[0] == "stop") {
             search_info.stop = true;
+            if(th.joinable()) {
+                th.join();
+            }
         } else if(tokens[0] == "d") {
             std::cout << pos.to_string() << std::endl;
         } else {
