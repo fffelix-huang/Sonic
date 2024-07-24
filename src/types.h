@@ -2,6 +2,8 @@
 
 namespace sonic {
 
+constexpr int MAX_DEPTH = 128;
+
 enum Direction : int {
 	NORTH = 8,
 	EAST = 1,

@@ -40,6 +40,7 @@ public:
     constexpr Color side_to_move() const { return sideToMove; }
     constexpr Square en_passant() const { return enPassant; }
     constexpr int game_ply() const { return gamePly; }
+    constexpr int rule50_ply() const { return rule50; }
     constexpr Castling castling_rights() const { return castlings; }
 
     // Returns the square that the king in at.

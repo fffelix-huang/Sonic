@@ -1,5 +1,6 @@
 #include "uci.h"
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <istream>
@@ -105,6 +106,7 @@ void parse_position(Position& pos, SearchInfo& search_info, const std::vector<st
 
 void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::string>& params) {
     const Color& us = pos.side_to_move();
+    search_info = SearchInfo();
     int time = -1, increment = 0;
     for(int i = 1; i < params.size(); i++) {
         if(params[i] == "wtime" && us == Color::WHITE) {
@@ -124,7 +126,7 @@ void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::str
             search_info.max_nodes = stoi(params[i]);
         } else if(params[i] == "depth") {
             i++;
-            search_info.max_depth = stoi(params[i]);
+            search_info.max_depth = std::min(stoi(params[i]), MAX_DEPTH);
         }
     }
     if(time == -1) {

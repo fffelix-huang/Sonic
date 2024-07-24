@@ -10,10 +10,53 @@
 
 namespace sonic {
 
+int qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
+    search_info.nodes++;
+    if(pos.rule50_ply() >= 100) {
+        return 0;
+    }
+    int score = evaluate(pos);
+    if(search_info.time_out()) {
+        return score;
+    }
+    if(pos.game_ply() > MAX_DEPTH - 1) {
+        return score;
+    }
+    if(score >= beta) {
+        return score;
+    }
+    alpha = std::max(alpha, score);
+    MoveList captures;
+    generate_moves<GenType::CAPTURE>(pos, captures);
+    sort_moves(pos, captures);
+    for(Move m : captures) {
+        UndoInfo info;
+        if(!pos.make_move(m, info)) {
+            pos.unmake_move(info);
+            continue;
+        }
+        int score = -qsearch(pos, search_info, -beta, -alpha);
+        pos.unmake_move(info);
+        if(score > alpha) {
+            alpha = score;
+            if(alpha >= beta) {
+                break;
+            }
+        }
+    }
+    return alpha;
+}
+
 // Negamax search with alpha-beta pruning.
 int negamax(Position& pos, SearchInfo& search_info, int alpha, int beta, int depth, Move& move) {
-    if(depth <= 0 || search_info.time_out()) {
+    if(pos.rule50_ply() >= 100) {
+        return 0;
+    }
+    if(search_info.time_out()) {
         return evaluate(pos);
+    }
+    if(depth <= 0) {
+        return qsearch(pos, search_info, alpha, beta);
     }
     search_info.nodes++;
     // Perform search on the best move from previous search first.
