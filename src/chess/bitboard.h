@@ -44,6 +44,10 @@ public:
 	constexpr std::uint64_t to_bb() const { return std::uint64_t(1) << square; }
 
 	std::string to_string() const {
+		// SQ_NONE
+		if(square == 255) {
+			return std::string("(none)");
+		}
 		return std::string(1, 'a' + col()) + std::string(1, '1' + row());
 	}
 	

@@ -146,7 +146,13 @@ bool Position::attacks_by(Square sq, Color c) const {
 }
 
 // Apply a move on the board and returns true if the given move is legal.
-bool Position::make_move(Move m) {
+bool Position::make_move(Move m, UndoInfo& info) {
+    info.last_move = m;
+    info.rule50 = rule50;
+    info.castling_state = castlings;
+    info.en_passant = enPassant;
+    info.captured_piece = Piece::NO_PIECE;
+
     gamePly++;
     rule50++;
 
@@ -182,6 +188,7 @@ bool Position::make_move(Move m) {
 
     if(piece_on(to) != Piece::NO_PIECE) {
         // Reset rule50 when captures.
+        info.captured_piece = piece_on(to);
         rule50 = 0;
         remove_piece(to);
     }
@@ -246,6 +253,56 @@ bool Position::make_move(Move m) {
     }
 
     return !attacks_by(king_square(us), them);
+}
+
+void Position::unmake_move(const UndoInfo& info) {
+    Piece moved_piece = piece_on(info.last_move.to());
+    remove_piece(info.last_move.to());
+
+    // Check promotion.
+    if(info.last_move.promotion() != Move::Promotion::None) {
+        moved_piece = (sideToMove == Color::WHITE ? Piece::B_PAWN : Piece::W_PAWN);
+    }
+    add_piece(info.last_move.from(), moved_piece);
+
+    // Check captures.
+    if(info.captured_piece != Piece::NO_PIECE) {
+        add_piece(info.last_move.to(), info.captured_piece);
+    }
+
+    // Check en passant.
+    if(type(moved_piece) == PieceType::PAWN && info.last_move.to() == info.en_passant) {
+        Direction d = (sideToMove == Color::WHITE ? Direction::NORTH : Direction::SOUTH);
+        add_piece(info.last_move.to() + d, sideToMove == Color::WHITE ? Piece::W_PAWN : Piece::B_PAWN);
+    }
+
+    // Check castling.
+    if(type(moved_piece) == PieceType::KING) {
+        if(info.last_move == Castling::WHITE_00_MOVE) {
+            const Move& rook_move = Castling::WHITE_00_ROOK_MOVE;
+            remove_piece(rook_move.to());
+            add_piece(rook_move.from(), Piece::W_ROOK);
+        } else if(info.last_move == Castling::WHITE_000_MOVE) {
+            const Move& rook_move = Castling::WHITE_000_ROOK_MOVE;
+            remove_piece(rook_move.to());
+            add_piece(rook_move.from(), Piece::W_ROOK);
+        } else if(info.last_move == Castling::BLACK_00_MOVE) {
+            const Move& rook_move = Castling::BLACK_00_ROOK_MOVE;
+            remove_piece(rook_move.to());
+            add_piece(rook_move.from(), Piece::B_ROOK);
+        } else if(info.last_move == Castling::BLACK_000_MOVE) {
+            const Move& rook_move = Castling::BLACK_000_ROOK_MOVE;
+            remove_piece(rook_move.to());
+            add_piece(rook_move.from(), Piece::B_ROOK);
+        }
+    }
+
+    // Restore states.
+    castlings = info.castling_state;
+    enPassant = info.en_passant;
+    rule50 = info.rule50;
+    gamePly--;
+    sideToMove = other_color(sideToMove);
 }
 
 // Visualize the current position.

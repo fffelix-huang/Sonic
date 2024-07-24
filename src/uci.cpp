@@ -98,7 +98,8 @@ void parse_position(Position& pos, SearchInfo& search_info, const std::vector<st
             }
         }
         Move move(from, to, promotion);
-        assert(pos.make_move(move));
+        UndoInfo info;
+        assert(pos.make_move(move, info));
     }
 }
 

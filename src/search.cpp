@@ -11,17 +11,18 @@
 namespace sonic {
 
 // Negamax search with alpha-beta pruning.
-int negamax(const Position& pos, SearchInfo& search_info, int alpha, int beta, int depth, Move& move) {
+int negamax(Position& pos, SearchInfo& search_info, int alpha, int beta, int depth, Move& move) {
     if(depth <= 0 || search_info.time_out()) {
         return evaluate(pos);
     }
     search_info.nodes++;
     // Perform search on the best move from previous search first.
     if(move != Move::null_move()) {
-        Position new_pos(pos);
-        assert(new_pos.make_move(move));
+        UndoInfo info;
+        assert(pos.make_move(move, info));
         Move tmp = Move::null_move();
-        int score = -negamax(new_pos, search_info, -beta, -alpha, depth - 1, tmp);
+        int score = -negamax(pos, search_info, -beta, -alpha, depth - 1, tmp);
+        pos.unmake_move(info);
         if(score > alpha) {
             alpha = score;
             if(alpha >= beta) {
@@ -39,13 +40,15 @@ int negamax(const Position& pos, SearchInfo& search_info, int alpha, int beta, i
             legal_moves++;
             continue;
         }
-        Position new_pos(pos);
-        if(!new_pos.make_move(m)) {
+        UndoInfo info;
+        if(!pos.make_move(m, info)) {
+            pos.unmake_move(info);
             continue;
         }
         legal_moves++;
         Move tmp = Move::null_move();
-        int score = -negamax(new_pos, search_info, -beta, -alpha, depth - 1, tmp);
+        int score = -negamax(pos, search_info, -beta, -alpha, depth - 1, tmp);
+        pos.unmake_move(info);
         if(score > alpha) {
             alpha = score;
             best_move = m;
@@ -62,7 +65,7 @@ int negamax(const Position& pos, SearchInfo& search_info, int alpha, int beta, i
     return alpha;
 }
 
-void search(const Position& pos, SearchInfo& search_info) {
+void search(Position& pos, SearchInfo& search_info) {
     // Iterative deepening
     Move best_move = Move::null_move();
     for(int depth = 1; depth <= search_info.max_depth; depth++) {

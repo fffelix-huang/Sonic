@@ -12,7 +12,7 @@
 namespace sonic {
 
 // Count number of leaf nodes.
-std::uint64_t perft(const Position& pos, int depth) {
+std::uint64_t perft(Position& pos, int depth) {
     if(depth == 0) {
         return 1;
     }
@@ -20,12 +20,14 @@ std::uint64_t perft(const Position& pos, int depth) {
     MoveList movelist;
     generate_moves<GenType::ALL>(pos, movelist);
     for(const Move& m : movelist) {
-        Position new_pos(pos);
-        if(!new_pos.make_move(m)) {
+        UndoInfo info;
+        if(!pos.make_move(m, info)) {
+            pos.unmake_move(info);
             continue;
         }
-        std::uint64_t count = perft(new_pos, depth - 1);
+        std::uint64_t count = perft(pos, depth - 1);
         node_count += count;
+        pos.unmake_move(info);
     }
     return node_count;
 }

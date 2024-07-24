@@ -14,6 +14,14 @@
 
 namespace sonic {
 
+struct UndoInfo {
+    Move last_move;
+    Castling castling_state;
+    Square en_passant;
+    Piece captured_piece;
+    int rule50;
+};
+
 class Position {
 public:
 	Position() : Position(INITIAL_FEN) {}
@@ -61,7 +69,10 @@ public:
     bool attacks_by(Square sq, Color c) const;
     
     // Apply a move on the board and returns true if the given move is legal.
-    bool make_move(Move m);
+    bool make_move(Move m, UndoInfo& info);
+
+    // Undo a move.
+    void unmake_move(const UndoInfo& info);
 
     // Visualize the current position.
     std::string to_string() const;
