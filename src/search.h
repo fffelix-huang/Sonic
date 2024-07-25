@@ -12,6 +12,7 @@
 #include "chess/all.h"
 #include "utils/timer.h"
 #include "book.h"
+#include "tt.h"
 #include "types.h"
 
 namespace sonic {
