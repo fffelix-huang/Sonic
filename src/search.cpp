@@ -13,8 +13,10 @@
 namespace sonic {
 
 Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
+    int ply = search_info.depth;
     search_info.nodes++;
-    search_info.seldepth = std::max(search_info.seldepth, search_info.depth);
+    search_info.seldepth = std::max(search_info.seldepth, ply);
+    search_info.pv_length[ply] = 0;
     if(search_info.is_repetition(pos.hashkey()) || pos.rule50_ply() >= 100) {
         return VALUE_DRAW;
     }
@@ -22,7 +24,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
         return VALUE_NONE;
     }
     int score = evaluate(pos);
-    if(search_info.depth > MAX_DEPTH - 1) {
+    if(ply > MAX_DEPTH - 1) {
         return score;
     }
     if(score >= beta) {
@@ -46,6 +48,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
         search_info.depth--;
         if(score > alpha) {
             alpha = score;
+            search_info.insert_pv(ply, m);
             if(alpha >= beta) {
                 break;
             }
@@ -56,8 +59,10 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
 
 // Negamax search with alpha-beta pruning.
 Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth) {
+    int ply = search_info.depth;
     search_info.nodes++;
-    search_info.seldepth = std::max(search_info.seldepth, search_info.depth);
+    search_info.seldepth = std::max(search_info.seldepth, ply);
+    search_info.pv_length[ply] = 0;
     if(search_info.is_repetition(pos.hashkey()) || pos.rule50_ply() >= 100) {
         return VALUE_DRAW;
     }
@@ -89,7 +94,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         search_info.depth--;
         if(score > alpha) {
             alpha = score;
-            search_info.insert_pv(search_info.depth, m);
+            search_info.insert_pv(ply, m);
             if(alpha >= beta) {
                 break;
             }
@@ -97,7 +102,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     }
     if(legal_moves == 0) {
         // Checkmate or Stalemate.
-        return pos.in_check() ? mated_in(search_info.depth) : VALUE_DRAW;
+        return pos.in_check() ? mated_in(ply) : VALUE_DRAW;
     }
     return alpha;
 }
