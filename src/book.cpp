@@ -49,10 +49,14 @@ Move Book::book_move(const Position& pos) const {
         if(entry.key != pos.hashkey()) {
             break;
         }
+        Move move = convert_move(entry.move);
+        if(!pos.legal(move)) {
+            continue;
+        }
         int score = entry.count;
         best_score += score;
         if(rng() % best_score < score) {
-            best_move = convert_move(entry.move);
+            best_move = move;
         }
     }
     return best_move;

@@ -151,6 +151,13 @@ bool Position::attacks_by(Square sq, Color c) const {
     return false;
 }
 
+// Returns if the given move is legal. This is very slow.
+bool Position::legal(Move m) const {
+    Position tmp(*this);
+    UndoInfo _;
+    return tmp.make_move(m, _);
+}
+
 // Apply a move on the board and returns true if the given move is legal.
 bool Position::make_move(Move m, UndoInfo& info) {
     info.last_move = m;

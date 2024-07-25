@@ -10,6 +10,7 @@
 #include <thread>
 
 #include "bench/benchmark.h"
+#include "bench/perft.h"
 #include "chess/all.h"
 #include "utils/strings.h"
 #include "utils/timer.h"
@@ -52,6 +53,8 @@ void uci_loop() {
             pos.set(INITIAL_FEN);
         } else if(tokens[0] == "bench") {
             run_bench();
+        } else if(tokens[0] == "perft") {
+            bench_perft();
         } else if(tokens[0] == "position") {
             parse_position(pos, search_info, tokens);
         } else if(tokens[0] == "go") {

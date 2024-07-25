@@ -88,6 +88,9 @@ public:
 
     // Returns if `sq` is being attacked by `c`. Doesn't consider en passant.
     bool attacks_by(Square sq, Color c) const;
+
+    // Returns if the given move is legal. This is very slow.
+    bool legal(Move m) const;
     
     // Apply a move on the board and returns true if the given move is legal.
     bool make_move(Move m, UndoInfo& info);
