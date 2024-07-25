@@ -15,14 +15,14 @@ namespace sonic {
 Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, search_info.depth);
-    if(pos.rule50_ply() >= 100) {
+    if(search_info.is_repetition(pos.hashkey()) || pos.rule50_ply() >= 100) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {
         return VALUE_NONE;
     }
     int score = evaluate(pos);
-    if(pos.game_ply() > MAX_DEPTH - 1) {
+    if(search_info.depth > MAX_DEPTH - 1) {
         return score;
     }
     if(score >= beta) {
@@ -34,6 +34,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     sort_moves(pos, captures);
     for(Move m : captures) {
         UndoInfo info;
+        search_info.store_history(pos.hashkey());
         search_info.depth++;
         if(!pos.make_move(m, info)) {
             pos.unmake_move(info);
@@ -57,11 +58,14 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
 Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth) {
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, search_info.depth);
-    if(pos.rule50_ply() >= 100) {
+    if(search_info.is_repetition(pos.hashkey()) || pos.rule50_ply() >= 100) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {
         return VALUE_NONE;
+    }
+    if(search_info.depth > MAX_DEPTH - 1) {
+        return evaluate(pos);
     }
     if(depth <= 0) {
         return qsearch(pos, search_info, alpha, beta);
@@ -72,6 +76,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     int legal_moves = 0;
     for(Move m : movelist) {
         UndoInfo info;
+        search_info.store_history(pos.hashkey());
         search_info.depth++;
         if(!pos.make_move(m, info)) {
             pos.unmake_move(info);
