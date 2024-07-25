@@ -48,9 +48,9 @@ int qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
 }
 
 // Negamax search with alpha-beta pruning.
-int negamax(Position& pos, SearchInfo& search_info, int alpha, int beta, int depth, Move& move) {
+Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth, Move& move) {
     if(pos.rule50_ply() >= 100) {
-        return 0;
+        return VALUE_DRAW;
     }
     if(search_info.time_out()) {
         return evaluate(pos);
@@ -64,7 +64,7 @@ int negamax(Position& pos, SearchInfo& search_info, int alpha, int beta, int dep
         UndoInfo info;
         assert(pos.make_move(move, info));
         Move tmp = Move::null_move();
-        int score = -negamax(pos, search_info, -beta, -alpha, depth - 1, tmp);
+        Value score = -negamax(pos, search_info, -beta, -alpha, depth - 1, tmp);
         pos.unmake_move(info);
         if(score > alpha) {
             alpha = score;
@@ -90,7 +90,7 @@ int negamax(Position& pos, SearchInfo& search_info, int alpha, int beta, int dep
         }
         legal_moves++;
         Move tmp = Move::null_move();
-        int score = -negamax(pos, search_info, -beta, -alpha, depth - 1, tmp);
+        Value score = -negamax(pos, search_info, -beta, -alpha, depth - 1, tmp);
         pos.unmake_move(info);
         if(score > alpha) {
             alpha = score;
@@ -102,7 +102,7 @@ int negamax(Position& pos, SearchInfo& search_info, int alpha, int beta, int dep
     }
     if(legal_moves == 0) {
         // Checkmate or Stalemate.
-        return pos.in_check() ? std::numeric_limits<int>::min() / 2 : 0;
+        return pos.in_check() ? mated_in(search_info.depth) : VALUE_DRAW;
     }
     move = best_move;
     return alpha;
@@ -112,7 +112,7 @@ void search(Position& pos, SearchInfo& search_info) {
     // Iterative deepening
     Move best_move = Move::null_move();
     for(int depth = 1; depth <= search_info.max_depth; depth++) {
-        int score = negamax(pos, search_info, std::numeric_limits<int>::min() / 2, std::numeric_limits<int>::max() / 2, depth, best_move);
+        int score = negamax(pos, search_info, -VALUE_INF, VALUE_INF, depth, best_move);
         std::uint64_t ms = time_elapsed(search_info.start_time);
         std::cout << "info depth " << depth << " seldepth " << depth;
         std::cout << " score cp " << score << " nodes " << search_info.nodes;

@@ -1,9 +1,10 @@
 #pragma once
 
 #include "chess/all.h"
+#include "types.h"
 
 namespace sonic {
 
-int evaluate(const Position& pos);
+Value evaluate(const Position& pos);
 
 } // namespace sonic

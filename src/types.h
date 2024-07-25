@@ -2,7 +2,19 @@
 
 namespace sonic {
 
+constexpr int MAX_MOVES = 256;
 constexpr int MAX_DEPTH = 128;
+
+using Value = int;
+
+constexpr Value VALUE_ZERO = 0;
+constexpr Value VALUE_DRAW = 0;
+constexpr Value VALUE_NONE = 32002;
+constexpr Value VALUE_INF = 32001;
+constexpr Value VALUE_MATE = 32000;
+
+constexpr Value mate_in(int ply) { return VALUE_MATE - ply; }
+constexpr Value mated_in(int ply) { return -VALUE_MATE + ply; }
 
 enum Direction : int {
 	NORTH = 8,

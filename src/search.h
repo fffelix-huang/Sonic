@@ -7,6 +7,7 @@
 
 #include "chess/all.h"
 #include "utils/timer.h"
+#include "types.h"
 
 namespace sonic {
 
@@ -21,7 +22,7 @@ struct SearchInfo {
 
     // Current search depth.
     std::uint8_t depth = 0;
-    std::uint8_t max_depth = 150;
+    std::uint8_t max_depth = MAX_DEPTH;
 
     bool stop = false;
 

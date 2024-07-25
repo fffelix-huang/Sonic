@@ -2,10 +2,11 @@
 
 #include "chess/all.h"
 #include "utils/bits.h"
+#include "types.h"
 
 namespace sonic {
 
-constexpr int MiddleGamePieceSquareTable[PieceType::PIECE_NB][Square::SQ_NB] = {
+constexpr Value MiddleGamePieceSquareTable[PieceType::PIECE_NB][Square::SQ_NB] = {
     { // Pawn
         0, 0, 0, 0, 0, 0, 0, 0,
         166, 192, 204, 216, 216, 204, 192, 166,
@@ -68,7 +69,7 @@ constexpr int MiddleGamePieceSquareTable[PieceType::PIECE_NB][Square::SQ_NB] = {
     }
 };
 
-constexpr int EndGamePieceSquareTable[PieceType::PIECE_NB][Square::SQ_NB] = {
+constexpr Value EndGamePieceSquareTable[PieceType::PIECE_NB][Square::SQ_NB] = {
     { // Pawn
         0, 0, 0, 0, 0, 0, 0, 0, 
         256, 256, 256, 256, 256, 256, 256, 256, 
@@ -131,11 +132,11 @@ constexpr int EndGamePieceSquareTable[PieceType::PIECE_NB][Square::SQ_NB] = {
     }
 };
 
-int evaluate(const Position& pos) {
+Value evaluate(const Position& pos) {
     static constexpr int PieceTypeValues[] = {1, 3, 3, 5, 9};
     Color us = pos.side_to_move();
-    int mid_game_score = 0;
-    int end_game_score = 0;
+    Value mid_game_score = 0;
+    Value end_game_score = 0;
     int phase = 0;
     int coeff = 1;
     for(Color c : {Color::WHITE, Color::BLACK}) {
@@ -149,8 +150,8 @@ int evaluate(const Position& pos) {
         }
         coeff *= -1;
     }
-    int score = mid_game_score * phase + end_game_score * (78 - phase);
-    score /= 19968;
+    Value score = mid_game_score * phase + end_game_score * (78 - phase);
+    score /= 1950;
     return us == Color::WHITE ? score : -score;
 }
 
