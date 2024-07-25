@@ -42,6 +42,8 @@ Move Book::book_move(const Position& pos) const {
         }
         return Move(from, to, promotion);
     };
+    MoveList movelist;
+    generate_moves<GenType::ALL>(pos, movelist);
     Move best_move = NO_MOVE;
     int best_score = 0;
     for(int i = find_key(pos.hashkey()); i < book_size; i++) {
@@ -50,7 +52,8 @@ Move Book::book_move(const Position& pos) const {
             break;
         }
         Move move = convert_move(entry.move);
-        if(!pos.legal(move)) {
+        // Check if the given move is in movelist. This can filter out chess960 moves.
+        if(!movelist.contains(move)) {
             continue;
         }
         int score = entry.count;
@@ -80,7 +83,7 @@ int Book::find_key(std::uint64_t key) const {
 
 Book::Entry Book::read_entry(int pos) const {
     auto read_int = [&](int bytes) -> std::uint64_t {
-        std::uint64_t result;
+        std::uint64_t result = 0;
         for(int i = 0; i < bytes; i++) {
             int byte = fgetc(book);
             assert(byte != EOF);

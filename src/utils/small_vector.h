@@ -40,6 +40,10 @@ public:
         sz = i;
     }
 
+    bool contains(const T& x) const {
+        return std::find(data.begin(), data.begin() + sz, x) != data.begin() + sz;
+    }
+
     constexpr void clear() { sz = 0; }
     constexpr std::size_t size() const { return sz; }
     constexpr bool empty() const { return sz == 0; }
