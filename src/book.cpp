@@ -24,7 +24,7 @@ void Book::close() {
 // Select a random book move.
 Move Book::book_move(const Position& pos) const {
     if(!is_open()) {
-        return NO_MOVE;
+        return MOVE_NONE;
     }
     // Convert polyglot move format to ours.
     auto convert_move = [&](int move) -> Move {
@@ -44,7 +44,7 @@ Move Book::book_move(const Position& pos) const {
     };
     MoveList movelist;
     generate_moves<GenType::ALL>(pos, movelist);
-    Move best_move = NO_MOVE;
+    Move best_move = MOVE_NONE;
     int best_score = 0;
     for(int i = find_key(pos.hashkey()); i < book_size; i++) {
         Book::Entry entry = read_entry(i);

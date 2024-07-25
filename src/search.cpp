@@ -110,7 +110,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
 void search(Position& pos, SearchInfo& search_info, const Book& book) {
     // Search for book move.
     Move best_move = book.book_move(pos);
-    if(best_move != NO_MOVE) {
+    if(best_move != MOVE_NONE) {
         std::cout << "info book move" << std::endl;
         std::cout << "bestmove " << best_move.to_string() << std::endl;
         return;

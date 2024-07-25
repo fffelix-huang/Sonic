@@ -9,7 +9,7 @@ namespace sonic {
 
 const std::string INITIAL_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-constexpr Move NO_MOVE = Move(0);
+constexpr Move MOVE_NONE = Move(0);
 
 constexpr Square SQ_NONE = Square(255);
 

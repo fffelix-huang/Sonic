@@ -30,7 +30,7 @@ public:
 
 	// Returns the move in UCI format.
 	std::string to_string() const {
-		// NO_MOVE
+		// MOVE_NONE
 		if(data == 0) {
 			return "(none)";
 		}
