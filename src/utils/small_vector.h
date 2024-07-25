@@ -10,9 +10,14 @@ namespace sonic {
 template<class T, std::size_t N>
 class SmallVector {
 public:
-    using iterator = std::array<T, N>::iterator;
+    using iterator = typename std::array<T, N>::iterator;
 
     SmallVector() = default;
+
+    SmallVector(std::size_t n) : sz(n) {
+        assert(n <= N);
+    }
+
     ~SmallVector() = default;
 
     void push_back(const T& x) {

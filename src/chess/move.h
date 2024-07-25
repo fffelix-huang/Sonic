@@ -18,8 +18,6 @@ public:
 	constexpr Move(Square from, Square to) : data(from.to_int() | (to.to_int() << 6)) {}
 	constexpr Move(Square from, Square to, Promotion promotion) : data(from.to_int() | (to.to_int() << 6) | (static_cast<std::uint8_t>(promotion) << 12)) {}
 
-	static constexpr Move null_move() { return Move(0xffff); }
-
 	Square from() const { return Square(data & kFromMask); }
 	Square to() const { return Square((data & kToMask) >> 6); }
 	Promotion promotion() const { return Promotion((data & kPromotionMask) >> 12); }
@@ -32,7 +30,8 @@ public:
 
 	// Returns the move in UCI format.
 	std::string to_string() const {
-		if(*this == Move::null_move()) {
+		// NO_MOVE
+		if(data == 0) {
 			return "(none)";
 		}
 		std::string res = from().to_string() + to().to_string();

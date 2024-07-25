@@ -1,5 +1,6 @@
 #include "search.h"
 
+#include <algorithm>
 #include <chrono>
 #include <limits>
 
@@ -10,15 +11,16 @@
 
 namespace sonic {
 
-int qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
+Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     search_info.nodes++;
+    search_info.seldepth = std::max(search_info.seldepth, search_info.depth);
     if(pos.rule50_ply() >= 100) {
-        return 0;
+        return VALUE_DRAW;
+    }
+    if(search_info.time_out()) {
+        return VALUE_NONE;
     }
     int score = evaluate(pos);
-    if(search_info.time_out()) {
-        return score;
-    }
     if(pos.game_ply() > MAX_DEPTH - 1) {
         return score;
     }
@@ -31,12 +33,15 @@ int qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     sort_moves(pos, captures);
     for(Move m : captures) {
         UndoInfo info;
+        search_info.depth++;
         if(!pos.make_move(m, info)) {
             pos.unmake_move(info);
+            search_info.depth--;
             continue;
         }
         int score = -qsearch(pos, search_info, -beta, -alpha);
         pos.unmake_move(info);
+        search_info.depth--;
         if(score > alpha) {
             alpha = score;
             if(alpha >= beta) {
@@ -48,53 +53,37 @@ int qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
 }
 
 // Negamax search with alpha-beta pruning.
-Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth, Move& move) {
+Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth) {
+    search_info.nodes++;
+    search_info.seldepth = std::max(search_info.seldepth, search_info.depth);
     if(pos.rule50_ply() >= 100) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {
-        return evaluate(pos);
+        return VALUE_NONE;
     }
     if(depth <= 0) {
         return qsearch(pos, search_info, alpha, beta);
     }
-    search_info.nodes++;
-    // Perform search on the best move from previous search first.
-    if(move != Move::null_move()) {
-        UndoInfo info;
-        assert(pos.make_move(move, info));
-        Move tmp = Move::null_move();
-        Value score = -negamax(pos, search_info, -beta, -alpha, depth - 1, tmp);
-        pos.unmake_move(info);
-        if(score > alpha) {
-            alpha = score;
-            if(alpha >= beta) {
-                return alpha;
-            }
-        }
-    }
     MoveList movelist;
     generate_moves<GenType::ALL>(pos, movelist);
     sort_moves(pos, movelist);
-    Move best_move = move;
     int legal_moves = 0;
     for(Move m : movelist) {
-        if(m == move) {
-            legal_moves++;
-            continue;
-        }
         UndoInfo info;
+        search_info.depth++;
         if(!pos.make_move(m, info)) {
             pos.unmake_move(info);
+            search_info.depth--;
             continue;
         }
         legal_moves++;
-        Move tmp = Move::null_move();
-        Value score = -negamax(pos, search_info, -beta, -alpha, depth - 1, tmp);
+        Value score = -negamax(pos, search_info, -beta, -alpha, depth - 1);
         pos.unmake_move(info);
+        search_info.depth--;
         if(score > alpha) {
             alpha = score;
-            best_move = m;
+            search_info.insert_pv(search_info.depth, m);
             if(alpha >= beta) {
                 break;
             }
@@ -104,24 +93,24 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         // Checkmate or Stalemate.
         return pos.in_check() ? mated_in(search_info.depth) : VALUE_DRAW;
     }
-    move = best_move;
     return alpha;
 }
 
 void search(Position& pos, SearchInfo& search_info) {
     // Iterative deepening
-    Move best_move = Move::null_move();
+    Move best_move = NO_MOVE;
     for(int depth = 1; depth <= search_info.max_depth; depth++) {
-        int score = negamax(pos, search_info, -VALUE_INF, VALUE_INF, depth, best_move);
-        std::uint64_t ms = time_elapsed(search_info.start_time);
-        std::cout << "info depth " << depth << " seldepth " << depth;
-        std::cout << " score cp " << score << " nodes " << search_info.nodes;
-        std::cout << " nps " << (search_info.nodes * 1000) / (ms + 1);
-        std::cout << " time " << ms;
-        std::cout << " pv " << best_move.to_string() << std::endl;
+        Value score = negamax(pos, search_info, -VALUE_INF, VALUE_INF, depth);
         if(search_info.time_out()) {
             break;
         }
+        best_move = search_info.pv[0][0];
+        std::uint64_t ms = time_elapsed(search_info.start_time);
+        std::cout << "info depth " << depth << " seldepth " << search_info.seldepth;
+        std::cout << " score cp " << score << " nodes " << search_info.nodes;
+        std::cout << " nps " << (search_info.nodes * 1000) / (ms + 1);
+        std::cout << " time " << ms;
+        std::cout << " pv " << search_info.pv_to_string() << std::endl;
     }
     std::cout << "bestmove " << best_move.to_string() << std::endl;
 }
