@@ -6,6 +6,7 @@
 #include "../chess/all.h"
 #include "../utils/strings.h"
 #include "../utils/timer.h"
+#include "../book.h"
 #include "../uci.h"
 #include "../search.h"
 
@@ -81,7 +82,7 @@ void run_bench() {
         parse_position(pos, search_info, params);
         parse_go(pos, search_info, go_params);
         std::cout << "Position [" << i + 1 << "/" << bench_positions.size() << "]" << " (" << pos.fen() << ")" << std::endl;
-        search(pos, search_info);
+        search(pos, search_info, Book());
         node_count += search_info.nodes;
         std::cout << "\n";
     }

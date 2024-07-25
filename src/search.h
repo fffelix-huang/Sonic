@@ -11,6 +11,7 @@
 
 #include "chess/all.h"
 #include "utils/timer.h"
+#include "book.h"
 #include "types.h"
 
 namespace sonic {
@@ -33,7 +34,7 @@ struct SearchInfo {
     bool time_out() const { return stop || (max_time < time_elapsed(start_time)); }
 
     std::array<std::array<Move, MAX_DEPTH>, MAX_DEPTH> pv;
-    std::array<std::uint8_t, MAX_DEPTH> pv_length = {};
+    std::array<int, MAX_DEPTH> pv_length = {};
 
     void insert_pv(int ply, Move move) {
         pv[ply][0] = move;
@@ -53,6 +54,6 @@ struct SearchInfo {
     }
 };
 
-void search(Position& pos, SearchInfo& search_info);
+void search(Position& pos, SearchInfo& search_info, const Book& book);
 
 } // namespace sonic

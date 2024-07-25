@@ -6,6 +6,7 @@
 
 #include "chess/all.h"
 #include "utils/timer.h"
+#include "book.h"
 #include "evaluate.h"
 #include "movesort.h"
 
@@ -96,9 +97,15 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     return alpha;
 }
 
-void search(Position& pos, SearchInfo& search_info) {
+void search(Position& pos, SearchInfo& search_info, const Book& book) {
+    // Search for book move.
+    Move best_move = book.book_move(pos);
+    if(best_move != NO_MOVE) {
+        std::cout << "info book move" << std::endl;
+        std::cout << "bestmove " << best_move.to_string() << std::endl;
+        return;
+    }
     // Iterative deepening
-    Move best_move = NO_MOVE;
     for(int depth = 1; depth <= search_info.max_depth; depth++) {
         Value score = negamax(pos, search_info, -VALUE_INF, VALUE_INF, depth);
         if(search_info.time_out()) {

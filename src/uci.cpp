@@ -13,12 +13,16 @@
 #include "chess/all.h"
 #include "utils/strings.h"
 #include "utils/timer.h"
+#include "book.h"
 #include "search.h"
 
 namespace sonic {
 
-void uci_loop(Position& pos, SearchInfo& search_info) {
+void uci_loop() {
     std::cout << "Sonic Chess Engine, written by Ting-Hsuan Huang" << std::endl;
+    Position pos;
+    SearchInfo search_info;
+    Book book;
     std::string cmd;
     std::thread th;
     while(std::getline(std::cin, cmd)) {
@@ -26,11 +30,18 @@ void uci_loop(Position& pos, SearchInfo& search_info) {
             continue;
         }
         std::vector<std::string> tokens = split_string(cmd, ' ');
-        if(tokens[0] == "quit") {
+        // setoption name book value <polyglot book name>
+        if(tokens[0] == "setoption") {
+            assert(tokens[1] == "name");
+            assert(tokens[2] == "book");
+            assert(tokens[3] == "value");
+            book.open(tokens[4]);
+        } else if(tokens[0] == "quit") {
             std::exit(0);
         } else if(tokens[0] == "uci") {
             std::cout << "id name Sonic" << std::endl;
             std::cout << "id author Ting-Hsuan Huang" << std::endl;
+            std::cout << "option name book type string default <none>" << std::endl;
             std::cout << "uciok" << std::endl;
         } else if(tokens[0] == "isready") {
             std::cout << "readyok" << std::endl;
@@ -48,7 +59,7 @@ void uci_loop(Position& pos, SearchInfo& search_info) {
                 th.join();
             }
             parse_go(pos, search_info, tokens);
-            th = std::thread(search, std::ref(pos), std::ref(search_info));
+            th = std::thread(search, std::ref(pos), std::ref(search_info), book);
         } else if(tokens[0] == "stop") {
             search_info.stop = true;
             if(th.joinable()) {
