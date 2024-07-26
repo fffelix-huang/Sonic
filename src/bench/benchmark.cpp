@@ -71,7 +71,7 @@ std::vector<std::string> bench_positions = {
 namespace sonic {
 
 void run_bench() {
-    const std::vector<std::string> go_params = {"go", "depth", "9"};
+    const std::vector<std::string> go_params = {"go", "depth", "7"};
     std::uint64_t node_count = 0;
     TimePoint start = current_time();
     Position pos;
