@@ -34,13 +34,16 @@ void uci_loop() {
         std::vector<std::string> tokens = split_string(cmd, ' ');
         if(tokens[0] == "setoption") {
             assert(tokens[1] == "name");
-            assert(tokens[3] == "value");
             if(tokens[2] == "book") {
+                assert(tokens[3] == "value");
                 book.open(tokens[4]);
             } else if(tokens[2] == "hash") {
+                assert(tokens[3] == "value");
                 int mb = stoi(tokens[4]);
                 mb = std::clamp(mb, 1, 1024);
                 TT.resize(mb);
+            } else if(tokens[2] == "clearhash") {
+                TT.clear();
             } else {
                 std::cout << "Unknown option." << std::endl;
             }
@@ -51,6 +54,7 @@ void uci_loop() {
             std::cout << "id author Ting-Hsuan Huang" << std::endl;
             std::cout << "option name book type string default <none>" << std::endl;
             std::cout << "option name hash type spin default 16 min 1 max 1024" << std::endl;
+            std::cout << "option name clearhash type button" << std::endl;
             std::cout << "uciok" << std::endl;
         } else if(tokens[0] == "isready") {
             std::cout << "readyok" << std::endl;
