@@ -29,11 +29,11 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     if(ply > MAX_DEPTH - 1) {
         return score;
     }
-    TTEntry entry = TT.get(pos);
-    if(entry.key == pos.hashkey()) {
-        if(entry.flag == TTFlag::TT_EXACT || (entry.flag == TTFlag::TT_ALPHA && entry.score <= alpha) || (entry.flag == TTFlag::TT_BETA && entry.score >= beta)) {
-            return entry.score;
-        }
+    // Check for transposition.
+    Move tt_move = MOVE_NONE;
+    Value tt_score = TT.get(pos, ply, 0, alpha, beta, tt_move);
+    if(ply > 0 && tt_score != VALUE_NONE) {
+        return tt_score;
     }
     if(score >= beta) {
         return score;
@@ -62,12 +62,12 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
             best_move = m;
             if(score > alpha) {
                 alpha = score;
-                search_info.insert_pv(ply, m);
                 flag = TTFlag::TT_EXACT;
                 if(alpha >= beta) {
                     flag = TTFlag::TT_BETA;
                     break;
                 }
+                search_info.insert_pv(ply, m);
             }
         }
     }
@@ -76,7 +76,6 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
 }
 
 // Negamax search with alpha-beta pruning.
-template<bool root_node>
 Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth) {
     int ply = search_info.depth;
     search_info.nodes++;
@@ -94,22 +93,12 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     if(depth <= 0) {
         return qsearch(pos, search_info, alpha, beta);
     }
-    bool pv_node = (beta - alpha > 1) || root_node;
+    bool pv_node = (beta - alpha > 1);
     // Check for transposition.
-    TTEntry entry = TT.get(pos);
-    bool tt_hit = entry.key == pos.hashkey();
-    if(tt_hit && !pv_node) {
-        if(entry.depth >= depth) {
-            if(entry.flag == TTFlag::TT_EXACT) {
-                return entry.score;
-            }
-            if(entry.flag == TTFlag::TT_ALPHA && entry.score <= alpha) {
-                return entry.score;
-            }
-            if(entry.flag == TTFlag::TT_BETA && entry.score >= beta) {
-                return entry.score;
-            }
-        }
+    Move tt_move = MOVE_NONE;
+    Value tt_score = TT.get(pos, ply, depth, alpha, beta, tt_move);
+    if(ply > 0 && tt_score != VALUE_NONE && !pv_node) {
+        return tt_score;
     }
     MoveList movelist;
     generate_moves<GenType::ALL>(pos, movelist);
@@ -128,7 +117,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
             continue;
         }
         legal_moves++;
-        Value score = -negamax<false>(pos, search_info, -beta, -alpha, depth - 1);
+        Value score = -negamax(pos, search_info, -beta, -alpha, depth - 1);
         pos.unmake_move(info);
         search_info.depth--;
         if(score > best_score) {
@@ -137,13 +126,11 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
             if(score > alpha) {
                 alpha = score;
                 flag = TTFlag::TT_EXACT;
-                if(pv_node) {
-                    search_info.insert_pv(ply, m);
-                }
                 if(alpha >= beta) {
                     flag = TTFlag::TT_BETA;
                     break;
                 }
+                search_info.insert_pv(ply, m);
             }
         }
     }
@@ -165,7 +152,7 @@ void search(Position& pos, SearchInfo& search_info, const Book& book) {
     }
     // Iterative deepening
     for(int depth = 1; depth <= search_info.max_depth; depth++) {
-        Value score = negamax<true>(pos, search_info, -VALUE_INF, VALUE_INF, depth);
+        Value score = negamax(pos, search_info, -VALUE_INF, VALUE_INF, depth);
         if(search_info.time_out()) {
             break;
         }

@@ -28,9 +28,32 @@ void TranspositionTable::clear() {
     entries_count = 0;
 }
 
-TTEntry TranspositionTable::get(const Position& pos) const {
-    int index = pos.hashkey() & (size - 1);
-    return entries[index];
+Value TranspositionTable::get(const Position& pos, int ply, int depth, Value alpha, Value beta, Move& m) const {
+    const TTEntry& entry = entries[pos.hashkey() & (size - 1)];
+    if(entry.key != pos.hashkey()) {
+        return VALUE_NONE;
+    }
+    m = entry.move;
+    if(entry.depth >= depth) {
+        Value score = entry.score;
+        if(is_mate_value(score)) {
+            if(score < 0) {
+                score += ply;
+            } else {
+                score -= ply;
+            }
+        }
+        if(entry.flag == TTFlag::TT_EXACT) {
+            return score;
+        }
+        if(entry.flag == TTFlag::TT_ALPHA && score <= alpha) {
+            return alpha;
+        }
+        if(entry.flag == TTFlag::TT_BETA && score >= beta) {
+            return beta;
+        }
+    }
+    return VALUE_NONE;
 }
 
 void TranspositionTable::store(const Position& pos, int depth, Value score, Move move, TTFlag flag) {
