@@ -29,7 +29,9 @@ public:
     void resize(std::size_t mbSize);
     void clear();
 
-    Value get(const Position& pos, int ply, int depth, Value alpha, Value beta, Move& m) const;
+    const TTEntry* entry_address(std::uint64_t key) const;
+
+    Value probe(const Position& pos, int ply, int depth, Value alpha, Value beta, Move& m) const;
     void store(const Position& pos, int depth, Value score, Move move, TTFlag flag);
 
     constexpr int hashfull() const { return entries_count * 1000 / size; }

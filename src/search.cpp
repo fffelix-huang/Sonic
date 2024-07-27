@@ -5,6 +5,7 @@
 #include <limits>
 
 #include "chess/all.h"
+#include "utils/misc.h"
 #include "utils/timer.h"
 #include "book.h"
 #include "evaluate.h"
@@ -31,7 +32,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     }
     // Check for transposition.
     Move tt_move = MOVE_NONE;
-    Value tt_score = TT.get(pos, ply, 0, alpha, beta, tt_move);
+    Value tt_score = TT.probe(pos, ply, 0, alpha, beta, tt_move);
     if(ply > 0 && tt_score != VALUE_NONE) {
         return tt_score;
     }
@@ -54,6 +55,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
             search_info.depth--;
             continue;
         }
+        prefetch(TT.entry_address(pos.hashkey()));
         Value score = -qsearch(pos, search_info, -beta, -alpha);
         pos.unmake_move(info);
         search_info.depth--;
@@ -96,7 +98,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     bool pv_node = (beta - alpha > 1);
     // Check for transposition.
     Move tt_move = MOVE_NONE;
-    Value tt_score = TT.get(pos, ply, depth, alpha, beta, tt_move);
+    Value tt_score = TT.probe(pos, ply, depth, alpha, beta, tt_move);
     if(ply > 0 && tt_score != VALUE_NONE && !pv_node) {
         return tt_score;
     }
@@ -116,6 +118,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
             search_info.depth--;
             continue;
         }
+        prefetch(TT.entry_address(pos.hashkey()));
         legal_moves++;
         Value score = -negamax(pos, search_info, -beta, -alpha, depth - 1);
         pos.unmake_move(info);

@@ -28,7 +28,7 @@ void TranspositionTable::clear() {
     entries_count = 0;
 }
 
-Value TranspositionTable::get(const Position& pos, int ply, int depth, Value alpha, Value beta, Move& m) const {
+Value TranspositionTable::probe(const Position& pos, int ply, int depth, Value alpha, Value beta, Move& m) const {
     const TTEntry& entry = entries[pos.hashkey() & (size - 1)];
     if(entry.key != pos.hashkey()) {
         return VALUE_NONE;
@@ -72,6 +72,10 @@ void TranspositionTable::store(const Position& pos, int depth, Value score, Move
     entry.score = score;
     entry.move = move;
     entry.flag = flag;
+}
+
+const TTEntry* TranspositionTable::entry_address(std::uint64_t key) const {
+    return &entries[key & (size - 1)];
 }
 
 } // namespace sonic
