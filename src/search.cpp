@@ -20,7 +20,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
-    if(search_info.is_repetition(pos.hashkey()) || pos.rule50_ply() >= 100) {
+    if((ply > 0 && pos.is_repetition()) || pos.rule50_ply() >= 100) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {
@@ -48,7 +48,6 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     TTFlag flag = TTFlag::TT_ALPHA;
     for(Move m : captures) {
         UndoInfo info;
-        search_info.store_history(pos.hashkey());
         search_info.depth++;
         if(!pos.make_move(m, info)) {
             pos.unmake_move(info);
@@ -83,7 +82,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
-    if(search_info.is_repetition(pos.hashkey()) || pos.rule50_ply() >= 100) {
+    if((ply > 0 && pos.is_repetition()) || pos.rule50_ply() >= 100) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {
@@ -111,7 +110,6 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     int legal_moves = 0;
     for(Move m : movelist) {
         UndoInfo info;
-        search_info.store_history(pos.hashkey());
         search_info.depth++;
         if(!pos.make_move(m, info)) {
             pos.unmake_move(info);

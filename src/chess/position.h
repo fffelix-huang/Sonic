@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 
+#include <array>
 #include <cassert>
 #include <vector>
 #include <string>
@@ -95,6 +96,16 @@ public:
     // Undo a move.
     void unmake_move(const UndoInfo& info);
 
+    // Check if the current position occurs before.
+    bool is_repetition() const {
+        for(int i = 2; i < std::min(gamePly, rule50); i += 2) {
+            if(history_keys[gamePly - i] == key) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Visualize the current position.
     std::string to_string() const;
 
@@ -133,6 +144,7 @@ private:
     Castling castlings;
     Square enPassant;
     std::uint64_t key;
+    std::array<std::uint64_t, MAX_MOVES> history_keys = {};
 };
 
 } // namespace sonic

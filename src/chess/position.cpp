@@ -22,6 +22,7 @@ void Position::set(std::string fen) {
     std::vector<std::string> tokens = split_string(fen, ' ');
     assert(tokens.size() == 6);
     key = 0;
+    history_keys.fill(0);
 
     // 1. Piece placement
     clear_board();
@@ -160,6 +161,7 @@ bool Position::make_move(Move m, UndoInfo& info) {
     info.captured_piece = Piece::NO_PIECE;
     info.key = key;
 
+    history_keys[gamePly] = key;
     gamePly++;
     rule50++;
     key ^= zobrist_key(castlings) ^ zobrist_key(sideToMove) ^ (has_en_passant_capture() * zobrist_key(enPassant));

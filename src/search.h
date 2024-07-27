@@ -36,17 +36,6 @@ struct SearchInfo {
 
     std::array<std::uint64_t, MAX_DEPTH> history_keys;
 
-    void store_history(std::uint64_t key) { history_keys[depth] = key; }
-
-    bool is_repetition(std::uint64_t key) const {
-        for(int i = depth - 1; i >= 0; i--) {
-            if(history_keys[i] == key) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     std::array<std::array<Move, MAX_DEPTH>, MAX_DEPTH> pv;
     std::array<int, MAX_DEPTH> pv_length = {};
 
