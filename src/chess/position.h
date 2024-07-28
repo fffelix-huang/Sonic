@@ -22,6 +22,7 @@ struct UndoInfo {
     Square en_passant;
     Piece captured_piece;
     int rule50;
+    int history_count;
     std::uint64_t key;
 };
 
@@ -98,8 +99,8 @@ public:
 
     // Check if the current position occurs before.
     bool is_repetition() const {
-        for(int i = 2; i < std::min(gamePly, rule50); i += 2) {
-            if(history_keys[gamePly - i] == key) {
+        for(int i = 2; i < std::min(history_count, rule50); i += 2) {
+            if(history_keys[history_count - i] == key) {
                 return true;
             }
         }
@@ -145,6 +146,7 @@ private:
     Square enPassant;
     std::uint64_t key;
     std::array<std::uint64_t, MAX_MOVES> history_keys = {};
+    int history_count;
 };
 
 } // namespace sonic

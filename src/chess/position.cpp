@@ -23,6 +23,7 @@ void Position::set(std::string fen) {
     assert(tokens.size() == 6);
     key = 0;
     history_keys.fill(0);
+    history_count = 0;
 
     // 1. Piece placement
     clear_board();
@@ -156,12 +157,14 @@ bool Position::attacks_by(Square sq, Color c) const {
 bool Position::make_move(Move m, UndoInfo& info) {
     info.last_move = m;
     info.rule50 = rule50;
+    info.history_count = history_count;
     info.castling_state = castlings;
     info.en_passant = enPassant;
     info.captured_piece = Piece::NO_PIECE;
     info.key = key;
 
-    history_keys[gamePly] = key;
+    history_keys[history_count] = key;
+    history_count++;
     gamePly++;
     rule50++;
     key ^= zobrist_key(castlings) ^ zobrist_key(sideToMove) ^ (has_en_passant_capture() * zobrist_key(enPassant));
@@ -200,6 +203,7 @@ bool Position::make_move(Move m, UndoInfo& info) {
         // Reset rule50 when captures.
         info.captured_piece = piece_on(to);
         rule50 = 0;
+        history_count = 0;
         remove_piece(to);
     }
 
@@ -208,6 +212,7 @@ bool Position::make_move(Move m, UndoInfo& info) {
 
     if(pt == PieceType::PAWN) {
         rule50 = 0;
+        history_count = 0;
 
         // Check if the move is an en passant capture.
         if(to == enPassant) {
@@ -313,6 +318,7 @@ void Position::unmake_move(const UndoInfo& info) {
     castlings = info.castling_state;
     enPassant = info.en_passant;
     rule50 = info.rule50;
+    history_count = info.history_count;
     key = info.key;
     gamePly--;
     sideToMove = other_color(sideToMove);
