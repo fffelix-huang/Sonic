@@ -324,6 +324,38 @@ void Position::unmake_move(const UndoInfo& info) {
     sideToMove = other_color(sideToMove);
 }
 
+void Position::make_null_move(UndoInfo& info) {
+    info.last_move = MOVE_NONE;
+    info.rule50 = rule50;
+    info.history_count = history_count;
+    info.castling_state = castlings;
+    info.en_passant = enPassant;
+    info.captured_piece = Piece::NO_PIECE;
+    info.key = key;
+    history_keys[history_count] = key;
+    history_count++;
+    rule50++;
+    gamePly++;
+
+    key ^= zobrist_key(sideToMove);
+    sideToMove = other_color(sideToMove);
+    key ^= zobrist_key(sideToMove);
+
+    key ^= has_en_passant_capture() * zobrist_key(enPassant);
+    enPassant = SQ_NONE;
+    key ^= has_en_passant_capture() * zobrist_key(enPassant);
+}
+
+void Position::unmake_null_move(const UndoInfo& info) {
+    rule50 = info.rule50;
+    history_count = info.history_count;
+    castlings = info.castling_state;
+    enPassant = info.en_passant;
+    key = info.key;
+    gamePly--;
+    sideToMove = other_color(sideToMove);
+}
+
 // Visualize the current position.
 std::string Position::to_string() const {
     std::ostringstream os;

@@ -97,6 +97,12 @@ public:
     // Undo a move.
     void unmake_move(const UndoInfo& info);
 
+    // Make a null move.
+    void make_null_move(UndoInfo& info);
+
+    // Undo a null move.
+    void unmake_null_move(const UndoInfo& info);
+
     // Check if the current position occurs before.
     bool is_repetition() const {
         for(int i = 2; i < std::min(history_count, rule50); i += 2) {
