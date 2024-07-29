@@ -136,7 +136,10 @@ void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::str
     search_info = SearchInfo();
     int time = -1, increment = 0;
     for(int i = 1; i < params.size(); i++) {
-        if(params[i] == "wtime" && us == Color::WHITE) {
+        if(params[i] == "movetime") {
+            i++;
+            time = stoi(params[i]);
+        } else if(params[i] == "wtime" && us == Color::WHITE) {
             i++;
             time = stoi(params[i]);
         } else if(params[i] == "btime" && us == Color::BLACK) {
