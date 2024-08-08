@@ -2,6 +2,18 @@
 
 Sonic is a chess engine written in C++ that supports UCI protocol.
 
+## Installation
+
+You should have `Make` installed in order to build from source code.
+
+```
+git clone https://github.com/fffelix-huang/Sonic.git
+cd Sonic/src
+make
+```
+
+It will compile the source code into an executable named `sonic`.
+
 ## UCI Options
 
 | Name | Type | Default | Valid | Description |
