@@ -20,6 +20,13 @@ constexpr bool is_mate_value(Value score) { return VALUE_MATE - std::abs(score) 
 constexpr Value mate_in(int ply) { return VALUE_MATE - ply; }
 constexpr Value mated_in(int ply) { return -VALUE_MATE + ply; }
 
+inline std::string value_to_string(Value score) {
+    if(is_mate_value(score)) {
+	    return std::string("mate ") + std::to_string(score > 0 ? (VALUE_MATE - score + 1) / 2 : (-score - VALUE_MATE) / 2);
+	}
+	return std::string("cp ") + std::to_string(score);
+}
+
 enum Direction : int {
 	NORTH = 8,
 	EAST = 1,

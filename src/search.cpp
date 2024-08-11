@@ -183,7 +183,8 @@ void search(Position& pos, SearchInfo& search_info, const Book& book) {
         best_move = search_info.pv[0][0];
         std::uint64_t ms = time_elapsed(search_info.start_time);
         std::cout << "info depth " << depth << " seldepth " << search_info.seldepth;
-        std::cout << " score cp " << score << " nodes " << search_info.nodes;
+        std::cout << " score " << value_to_string(score);
+        std::cout << " nodes " << search_info.nodes;
         std::cout << " nps " << (search_info.nodes * 1000) / (ms + 1);
         std::cout << " hashfull " << TT.hashfull();
         std::cout << " time " << ms;
