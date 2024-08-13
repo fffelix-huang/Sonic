@@ -26,20 +26,20 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     if(search_info.time_out()) {
         return VALUE_NONE;
     }
-    Value score = evaluate(pos);
-    if(ply > MAX_DEPTH - 1) {
-        return score;
-    }
     // Check for transposition.
     Move tt_move = MOVE_NONE;
     Value tt_score = TT.probe(pos, ply, 0, alpha, beta, tt_move);
     if(ply > 0 && tt_score != VALUE_NONE) {
         return tt_score;
     }
-    if(score >= beta) {
-        return score;
+    Value static_eval = evaluate(pos);
+    if(ply > MAX_DEPTH - 1) {
+        return static_eval;
     }
-    alpha = std::max(alpha, score);
+    if(static_eval >= beta) {
+        return static_eval;
+    }
+    alpha = std::max(alpha, static_eval);
     MoveList captures;
     generate_moves<GenType::CAPTURE>(pos, captures);
     sort_moves(pos, captures);
@@ -174,11 +174,20 @@ void search(Position& pos, SearchInfo& search_info, const Book& book) {
         std::cout << "bestmove " << best_move.to_string() << std::endl;
         return;
     }
-    // Iterative deepening
+    // Aspiration window.
+    Value alpha = -VALUE_INF, beta = VALUE_INF;
+    // Iterative deepening.
     for(int depth = 1; depth <= search_info.max_depth; depth++) {
-        Value score = negamax(pos, search_info, -VALUE_INF, VALUE_INF, depth, true);
+        Value score = negamax(pos, search_info, alpha, beta, depth, true);
         if(search_info.time_out()) {
             break;
+        }
+        if(score <= alpha || score >= beta) {
+            // Research with full window.
+            alpha = -VALUE_INF;
+            beta = VALUE_INF;
+            depth--;
+            continue;
         }
         best_move = search_info.pv[0][0];
         std::uint64_t ms = time_elapsed(search_info.start_time);
@@ -189,6 +198,8 @@ void search(Position& pos, SearchInfo& search_info, const Book& book) {
         std::cout << " hashfull " << TT.hashfull();
         std::cout << " time " << ms;
         std::cout << " pv " << search_info.pv_to_string() << std::endl;
+        alpha = std::max(score - 20, -VALUE_INF);
+        beta = std::min(score + 20, VALUE_INF);
     }
     std::cout << "bestmove " << best_move.to_string() << std::endl;
 }

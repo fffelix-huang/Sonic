@@ -187,7 +187,7 @@ Value evaluate(const Position& pos) {
         coeff *= -1;
     }
     Value score = mid_game_score * phase + end_game_score * (78 - phase);
-    score /= 1950;
+    score /= 195;
     return us == Color::WHITE ? score : -score;
 }
 
