@@ -141,7 +141,11 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         }
         prefetch(TT.entry_address(pos.hashkey()));
         legal_moves++;
-        Value score = -negamax(pos, search_info, -beta, -alpha, depth - 1, true);
+        // PV search.
+        Value score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 1, true);
+        if(alpha < score && score < beta) {
+            score = -negamax(pos, search_info, -beta, -alpha, depth - 1, true);
+        }
         pos.unmake_move(info);
         search_info.depth--;
         if(score > best_score) {
