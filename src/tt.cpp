@@ -7,7 +7,7 @@
 
 namespace sonic {
 
-TranspositionTable TT;
+TranspositionTable TT(16);
 
 void TranspositionTable::resize(std::size_t mbSize) {
     constexpr int MB = 1024 * 1024;
