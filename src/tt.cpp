@@ -57,7 +57,7 @@ Value TranspositionTable::probe(const Position& pos, int ply, int depth, Value a
 }
 
 void TranspositionTable::store(const Position& pos, int depth, Value score, Move move, TTFlag flag) {
-    int index = pos.hashkey() & (size - 1);
+    size_t index = pos.hashkey() & (size - 1);
     assert(index < size);
     TTEntry& entry = entries[index];
     bool replace = entry.key != pos.hashkey() || entry.depth < depth + 2 || flag == TTFlag::TT_EXACT;

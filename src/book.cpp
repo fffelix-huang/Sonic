@@ -58,7 +58,7 @@ Move Book::book_move(const Position& pos) const {
         }
         int score = entry.count;
         best_score += score;
-        if(rng() % best_score < score) {
+        if(int(rng() % best_score) < score) {
             best_move = move;
         }
     }

@@ -76,11 +76,12 @@ void run_bench() {
     TimePoint start = current_time();
     Position pos;
     SearchInfo search_info;
-    for(int i = 0; i < bench_positions.size(); i++) {
+    for(size_t i = 0; i < bench_positions.size(); i++) {
         std::string fen = "position fen " + bench_positions[i];
         std::vector<std::string> params = split_string(fen, ' ');
         parse_position(pos, search_info, params);
         parse_go(pos, search_info, go_params);
+        TT.clear();
         std::cout << "Position [" << i + 1 << "/" << bench_positions.size() << "]" << " (" << pos.fen() << ")" << std::endl;
         search(pos, search_info, Book());
         node_count += search_info.nodes;

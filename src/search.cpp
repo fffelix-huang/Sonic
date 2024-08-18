@@ -15,7 +15,7 @@
 
 namespace sonic {
 
-Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
+Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     int ply = search_info.depth;
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, ply);
@@ -36,10 +36,13 @@ Value qsearch(Position& pos, SearchInfo& search_info, int alpha, int beta) {
     if(ply > MAX_DEPTH - 1) {
         return static_eval;
     }
-    if(static_eval >= beta) {
-        return static_eval;
+    bool in_check = pos.in_check();
+    if(!in_check) {
+        if(static_eval >= beta) {
+            return static_eval;
+        }
+        alpha = std::max(alpha, static_eval);
     }
-    alpha = std::max(alpha, static_eval);
     MoveList captures;
     generate_moves<GenType::CAPTURE>(pos, captures);
     sort_moves(pos, captures);
