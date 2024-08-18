@@ -108,13 +108,13 @@ void parse_position(Position& pos, SearchInfo& search_info, const std::vector<st
         pos.set(INITIAL_FEN);
         moves_start = 2;
     }
-    if(tokens.size() <= moves_start) {
+    if(static_cast<int>(tokens.size()) <= moves_start) {
         return;
     }
     if(tokens[moves_start] != "moves") {
         return;
     }
-    for(int i = moves_start + 1; i < tokens.size(); i++) {
+    for(size_t i = moves_start + 1; i < tokens.size(); i++) {
         Square from = Square(tokens[i][1] - '1', tokens[i][0] - 'a');
         Square to = Square(tokens[i][3] - '1', tokens[i][2] - 'a');
         Move::Promotion promotion = Move::Promotion::None;
@@ -137,7 +137,7 @@ void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::str
     const Color& us = pos.side_to_move();
     search_info = SearchInfo();
     int time = -1, increment = 0;
-    for(int i = 1; i < params.size(); i++) {
+    for(size_t i = 1; i < params.size(); i++) {
         if(params[i] == "movetime") {
             i++;
             time = stoi(params[i]);

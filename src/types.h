@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -21,6 +22,7 @@ constexpr Value mate_in(int ply) { return VALUE_MATE - ply; }
 constexpr Value mated_in(int ply) { return -VALUE_MATE + ply; }
 
 inline std::string value_to_string(Value score) {
+	assert(std::abs(score) <= VALUE_MATE);
     if(is_mate_value(score)) {
 	    return std::string("mate ") + std::to_string(score > 0 ? (VALUE_MATE - score + 1) / 2 : (-score - VALUE_MATE) / 2);
 	}

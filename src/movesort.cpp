@@ -1,33 +1,43 @@
 #include "movesort.h"
 
 #include <algorithm>
+#include <cassert>
 
 namespace sonic {
 
 void sort_moves(const Position& pos, MoveList& movelist) {
-    // 1. Promotions
-    int promotions = 0;
-    for(int i = 0; i < movelist.size(); i++) {
-        if(movelist[i].promotion() == Move::Promotion::Queen) {
-            std::swap(movelist[i], movelist[promotions]);
-            promotions++;
+    auto move_score = [&](Move m) -> int {
+        // 1. Promotions
+        if(m.promotion() == Move::Promotion::Queen) {
+            return 100001;
+        }
+        if(m.promotion() == Move::Promotion::Knight) {
+            return 100000;
+        }
+        // 2. MVV-LVA
+        // Pawn, Knight, Bishop, Rook, Queen, King
+        static constexpr int AttackValues[6] = {50, 30, 30, 20, 10, 0};
+        Piece from = pos.piece_on(m.from());
+        Piece to = pos.piece_on(m.to());
+        if(pos.is_capture(m)) {
+            return AttackValues[type(from)] - AttackValues[type(to)] + 500;
+        }
+        // 3. Others
+        return -AttackValues[type(from)];
+    };
+    static int scores[218];
+    for(size_t i = 0; i < movelist.size(); i++) {
+        scores[i] = move_score(movelist[i]);
+    }
+    // Selection sort
+    for(size_t i = 1; i < movelist.size(); i++) {
+        int j = i;
+        while(j - 1 >= 0 && scores[j] > scores[j - 1]) {
+            std::swap(scores[j], scores[j - 1]);
+            std::swap(movelist[j], movelist[j - 1]);
+            j--;
         }
     }
-    // 2. Captures
-    auto mid = std::partition(movelist.begin() + promotions, movelist.end(), [&](Move m) {
-        return pos.is_capture(m);
-    });
-    auto capture_move_score = [&](Move m) -> int {
-        // Pawn, Knight, Bishop, Rook, Queen
-        static constexpr int AttackValues[5] = {50, 35, 30, 20, 10};
-        Piece us = pos.piece_on(m.from());
-        Piece them = pos.piece_on(m.to());
-        return AttackValues[type(us)] - AttackValues[type(them)];
-    };
-    // 3. MVV-LVA
-    std::sort(movelist.begin() + promotions, mid, [&](Move a, Move b) {
-        return capture_move_score(a) > capture_move_score(b);
-    });
 }
 
 } // namespace sonic
