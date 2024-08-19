@@ -149,7 +149,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     int legal_moves = 0;
     bool skip_quiets = false;
     for(Move m : movelist) {
-        bool is_quiet = !pos.is_quiet(m);
+        bool is_quiet = pos.is_quiet(m);
         if(skip_quiets && is_quiet) {
             continue;
         }
