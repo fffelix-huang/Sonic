@@ -155,7 +155,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         }
         if(!root_node) {
             // Futility pruning.
-            Value futility_margin = 150 + 125 * depth;
+            Value futility_margin = 250 + 150 * depth;
             if(!in_check && depth <= 2 && is_quiet && eval + futility_margin < alpha) {
                 skip_quiets = true;
                 continue;
