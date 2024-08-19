@@ -91,8 +91,17 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     if(search_info.time_out()) {
         return VALUE_NONE;
     }
-    if(search_info.depth > MAX_DEPTH - 1) {
+    if(ply > MAX_DEPTH - 1) {
         return evaluate(pos);
+    }
+
+    // Mate distance pruning.
+    if(ply > 0) {
+        alpha = std::max(alpha, mated_in(ply));
+        beta = std::min(beta, mate_in(ply + 1));
+        if(alpha >= beta) {
+            return alpha;
+        }
     }
 
     bool pv_node = (beta - alpha > 1);
