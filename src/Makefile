@@ -43,3 +43,5 @@ CXXFLAGS += -Wall -g -std=c++17
 # systems; this requires testing.
 
 CXXFLAGS += -O3 -fno-exceptions -fomit-frame-pointer -fno-rtti -fstrict-aliasing
+
+LDFLAGS += -lpthread 
