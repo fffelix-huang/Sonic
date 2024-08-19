@@ -123,7 +123,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         return qsearch(pos, search_info, alpha, beta);
     }
 
-    Value eval = (in_check ? VALUE_INF : (tt_hit ? tt_score : evaluate(pos)));
+    Value eval = (in_check ? VALUE_INF : evaluate(pos));
 
     // Null move pruning.
     Color us = pos.side_to_move();
