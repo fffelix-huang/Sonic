@@ -150,17 +150,6 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     bool skip_quiets = false;
     for(Move m : movelist) {
         bool is_quiet = pos.is_quiet(m);
-        if(skip_quiets && is_quiet) {
-            continue;
-        }
-        if(!root_node) {
-            // Futility pruning.
-            Value futility_margin = 420;
-            if(!in_check && depth == 1 && is_quiet && eval + futility_margin < alpha) {
-                skip_quiets = true;
-                continue;
-            }
-        }
         UndoInfo info;
         search_info.depth++;
         if(!pos.make_move(m, info)) {
@@ -168,8 +157,24 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
             search_info.depth--;
             continue;
         }
-        prefetch(TT.entry_address(pos.hashkey()));
         legal_moves++;
+        bool gives_check = pos.in_check();
+        if(skip_quiets && is_quiet && !gives_check) {
+            pos.unmake_move(info);
+            search_info.depth--;
+            continue;
+        }
+        if(!root_node) {
+            // Futility pruning.
+            Value futility_margin = 175 + 125 * depth;
+            if(!in_check && depth <= 2 && is_quiet && !gives_check && eval + futility_margin < alpha) {
+                skip_quiets = true;
+                pos.unmake_move(info);
+                search_info.depth--;
+                continue;
+            }
+        }
+        prefetch(TT.entry_address(pos.hashkey()));
         // PV search.
         Value score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 1, true);
         if(alpha < score && score < beta) {
