@@ -147,7 +147,6 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
     int legal_moves = 0;
-    bool skip_quiets = false;
     for(Move m : movelist) {
         bool is_quiet = pos.is_quiet(m);
         UndoInfo info;
@@ -159,16 +158,10 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         }
         legal_moves++;
         bool gives_check = pos.in_check();
-        if(skip_quiets && is_quiet && !gives_check) {
-            pos.unmake_move(info);
-            search_info.depth--;
-            continue;
-        }
         if(!root_node) {
             // Futility pruning.
             Value futility_margin = 175 + 125 * depth;
             if(!in_check && depth <= 2 && is_quiet && !gives_check && eval + futility_margin < alpha) {
-                skip_quiets = true;
                 pos.unmake_move(info);
                 search_info.depth--;
                 continue;
