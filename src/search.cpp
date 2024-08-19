@@ -121,6 +121,12 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         return qsearch(pos, search_info, alpha, beta);
     }
 
+    // Reverse futility pruning.
+    Value eval = evaluate(pos);
+    if(depth <= 3 && eval - (250 + 70 * depth * depth) >= beta) {
+        return (eval + beta) / 2;
+    }
+
     // Null move pruning.
     Color us = pos.side_to_move();
     bool has_big_piece = (pos.pieces(us) - pos.pieces(us, PieceType::KING) - pos.pieces(us, PieceType::PAWN)).any();
