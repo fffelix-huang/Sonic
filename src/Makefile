@@ -37,7 +37,7 @@ $(EXE): $(OBJS)
 
 # Compile with full warnings, and symbol names
 
-CXXFLAGS += -Wall -g -std=c++20
+CXXFLAGS += -Wall -g -std=c++17
 
 # General optimization flags.  Note that -O2 might be faster than -O3 on some
 # systems; this requires testing.
