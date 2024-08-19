@@ -42,4 +42,6 @@ CXXFLAGS += -Wall -g -std=c++17
 # General optimization flags.  Note that -O2 might be faster than -O3 on some
 # systems; this requires testing.
 
-CXXFLAGS += -O3 -fno-exceptions -fomit-frame-pointer -fno-rtti -fstrict-aliasing
+CXXFLAGS += -O3 -lpthread -fno-exceptions -fomit-frame-pointer -fno-rtti -fstrict-aliasing
+
+LDFLAGS += -lpthread 
