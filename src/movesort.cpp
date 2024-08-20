@@ -5,16 +5,20 @@
 
 namespace sonic {
 
-void sort_moves(const Position& pos, MoveList& movelist) {
+void sort_moves(const Position& pos, MoveList& movelist, Move follow_pv_move) {
     auto move_score = [&](Move m) -> int {
-        // 1. Promotions
+        // 1. PV move
+        if(m == follow_pv_move) {
+            return 1000000;
+        }
+        // 2. Promotions
         if(m.promotion() == Move::Promotion::Queen) {
             return 100001;
         }
         if(m.promotion() == Move::Promotion::Knight) {
             return 100000;
         }
-        // 2. MVV-LVA
+        // 3. MVV-LVA
         // Pawn, Knight, Bishop, Rook, Queen, King
         static constexpr int AttackValues[6] = {50, 30, 30, 20, 10, 0};
         Piece from = pos.piece_on(m.from());
@@ -22,7 +26,7 @@ void sort_moves(const Position& pos, MoveList& movelist) {
         if(pos.is_capture(m)) {
             return AttackValues[type(from)] - AttackValues[type(to)] + 500;
         }
-        // 3. Others
+        // 4. Others
         return -AttackValues[type(from)];
     };
     static int scores[218];

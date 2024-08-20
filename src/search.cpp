@@ -45,7 +45,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     }
     MoveList captures;
     generate_moves<GenType::CAPTURE>(pos, captures);
-    sort_moves(pos, captures);
+    sort_moves(pos, captures, MOVE_NONE);
     Value best_score = -VALUE_INF;
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
@@ -142,7 +142,11 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
 
     MoveList movelist;
     generate_moves<GenType::ALL>(pos, movelist);
-    sort_moves(pos, movelist);
+    Move follow_pv_move = (search_info.follow_pv ? search_info.pv[ply][0] : MOVE_NONE);
+    sort_moves(pos, movelist, follow_pv_move);
+    if(!movelist.empty() && movelist[0] == follow_pv_move) {
+        search_info.follow_pv = true;
+    }
     Value best_score = -VALUE_INF;
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
@@ -209,6 +213,7 @@ void search(Position& pos, SearchInfo& search_info, const Book& book) {
     Value alpha = -VALUE_INF, beta = VALUE_INF;
     // Iterative deepening.
     for(int depth = 1; depth <= search_info.max_depth; depth++) {
+        search_info.follow_pv = true;
         Value score = negamax(pos, search_info, alpha, beta, depth, true);
         if(search_info.time_out()) {
             break;
