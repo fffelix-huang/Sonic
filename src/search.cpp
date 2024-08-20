@@ -150,7 +150,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     Value best_score = -VALUE_INF;
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
-    int legal_moves = 0;
+    int moves_searched = 0;
     for(Move m : movelist) {
         bool is_quiet = pos.is_quiet(m);
         UndoInfo info;
@@ -160,7 +160,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
             search_info.depth--;
             continue;
         }
-        legal_moves++;
+        moves_searched++;
         bool gives_check = pos.in_check();
         if(!root_node) {
             // Futility pruning.
@@ -172,10 +172,19 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
             }
         }
         prefetch(TT.entry_address(pos.hashkey()));
-        // PV search.
-        Value score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 1, true);
-        if(alpha < score && score < beta) {
-            score = -negamax(pos, search_info, -beta, -alpha, depth - 1, true);
+        Value score = VALUE_NONE;
+        if(moves_searched >= 5 && depth >= 3 && !in_check) {
+            score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 2, true);
+        } else {
+            // Do search on full-depth.
+            score = VALUE_INF;
+        }
+        if(score > alpha) {
+            // PV search.
+            score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 1, true);
+            if(alpha < score && score < beta) {
+                score = -negamax(pos, search_info, -beta, -alpha, depth - 1, true);
+            }
         }
         pos.unmake_move(info);
         search_info.depth--;
@@ -193,7 +202,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
             }
         }
     }
-    if(legal_moves == 0) {
+    if(moves_searched == 0) {
         // Checkmate or Stalemate.
         return in_check ? mated_in(ply) : VALUE_DRAW;
     }
