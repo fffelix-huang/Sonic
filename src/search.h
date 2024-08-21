@@ -36,8 +36,9 @@ struct SearchInfo {
 
     std::array<std::uint64_t, MAX_DEPTH> history_keys;
 
-    std::array<std::array<Move, MAX_DEPTH>, MAX_DEPTH> pv;
+    std::array<std::array<Move, MAX_DEPTH>, MAX_DEPTH> pv = {};
     std::array<int, MAX_DEPTH> pv_length = {};
+    bool follow_pv = false;
 
     void insert_pv(int ply, Move move) {
         pv[ply][0] = move;

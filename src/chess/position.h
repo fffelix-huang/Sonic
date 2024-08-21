@@ -60,6 +60,10 @@ public:
         return piece_on(to) != Piece::NO_PIECE || to == enPassant;
     }
 
+    bool is_quiet(Move m) const {
+        return !is_capture(m) && m.promotion() == Move::Promotion::None;
+    }
+
     bool has_en_passant_capture() const {
         if(enPassant == SQ_NONE) {
             return false;

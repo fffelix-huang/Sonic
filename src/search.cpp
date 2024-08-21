@@ -45,7 +45,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     }
     MoveList captures;
     generate_moves<GenType::CAPTURE>(pos, captures);
-    sort_moves(pos, captures);
+    sort_moves(pos, captures, MOVE_NONE);
     Value best_score = -VALUE_INF;
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
@@ -82,10 +82,11 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
 // Negamax search with alpha-beta pruning.
 Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth, bool do_null) {
     int ply = search_info.depth;
+    bool root_node = (ply == 0);
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
-    if((ply > 0 && pos.is_repetition()) || pos.rule50_ply() >= 100) {
+    if((!root_node && pos.is_repetition()) || pos.rule50_ply() >= 100) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {
@@ -96,7 +97,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     }
 
     // Mate distance pruning.
-    if(ply > 0) {
+    if(!root_node) {
         alpha = std::max(alpha, mated_in(ply));
         beta = std::min(beta, mate_in(ply + 1));
         if(alpha >= beta) {
@@ -108,7 +109,8 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     // Check for transposition.
     Move tt_move = MOVE_NONE;
     Value tt_score = TT.probe(pos, ply, depth, alpha, beta, tt_move);
-    if(ply > 0 && tt_score != VALUE_NONE && !pv_node) {
+    bool tt_hit = (tt_score != VALUE_NONE);
+    if(!root_node && tt_hit && !pv_node) {
         return tt_score;
     }
 
@@ -122,8 +124,8 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     }
 
     // Reverse futility pruning.
-    Value eval = evaluate(pos);
-    if(depth <= 3 && eval - (250 + 70 * depth * depth) >= beta) {
+    Value eval = (in_check ? VALUE_INF : evaluate(pos));
+    if(!in_check && depth <= 3 && eval - (250 + 70 * depth * depth) >= beta) {
         return (eval + beta) / 2;
     }
 
@@ -144,12 +146,17 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
 
     MoveList movelist;
     generate_moves<GenType::ALL>(pos, movelist);
-    sort_moves(pos, movelist);
+    Move follow_pv_move = (search_info.follow_pv ? search_info.pv[ply][0] : MOVE_NONE);
+    sort_moves(pos, movelist, follow_pv_move);
+    if(!movelist.empty() && movelist[0] == follow_pv_move) {
+        search_info.follow_pv = true;
+    }
     Value best_score = -VALUE_INF;
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
-    int legal_moves = 0;
+    int moves_searched = 0;
     for(Move m : movelist) {
+        bool is_quiet = pos.is_quiet(m);
         UndoInfo info;
         search_info.depth++;
         if(!pos.make_move(m, info)) {
@@ -157,12 +164,31 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
             search_info.depth--;
             continue;
         }
+        moves_searched++;
+        bool gives_check = pos.in_check();
+        if(!root_node) {
+            // Futility pruning.
+            Value futility_margin = 175 + 125 * depth;
+            if(!in_check && depth <= 2 && is_quiet && !gives_check && eval + futility_margin < alpha) {
+                pos.unmake_move(info);
+                search_info.depth--;
+                continue;
+            }
+        }
         prefetch(TT.entry_address(pos.hashkey()));
-        legal_moves++;
-        // PV search.
-        Value score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 1, true);
-        if(alpha < score && score < beta) {
-            score = -negamax(pos, search_info, -beta, -alpha, depth - 1, true);
+        Value score = VALUE_NONE;
+        if(moves_searched >= 5 && depth >= 3 && !in_check) {
+            score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 2, true);
+        } else {
+            // Do search on full-depth.
+            score = VALUE_INF;
+        }
+        if(score > alpha) {
+            // PV search.
+            score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 1, true);
+            if(alpha < score && score < beta) {
+                score = -negamax(pos, search_info, -beta, -alpha, depth - 1, true);
+            }
         }
         pos.unmake_move(info);
         search_info.depth--;
@@ -180,7 +206,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
             }
         }
     }
-    if(legal_moves == 0) {
+    if(moves_searched == 0) {
         // Checkmate or Stalemate.
         return in_check ? mated_in(ply) : VALUE_DRAW;
     }
@@ -200,6 +226,7 @@ void search(Position& pos, SearchInfo& search_info, const Book& book) {
     Value alpha = -VALUE_INF, beta = VALUE_INF;
     // Iterative deepening.
     for(int depth = 1; depth <= search_info.max_depth; depth++) {
+        search_info.follow_pv = true;
         Value score = negamax(pos, search_info, alpha, beta, depth, true);
         if(search_info.time_out()) {
             break;
