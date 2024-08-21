@@ -51,10 +51,8 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     MoveList captures;
     generate_moves<GenType::CAPTURE>(pos, captures);
     sort_moves(pos, captures, MOVE_NONE);
-    Value best_score = -VALUE_INF;
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
-    int moves_searched = 0;
     for(Move m : captures) {
         UndoInfo info;
         search_info.depth++;
@@ -63,30 +61,22 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
             search_info.depth--;
             continue;
         }
-        moves_searched++;
         prefetch(TT.entry_address(pos.hashkey()));
         Value score = -qsearch(pos, search_info, -beta, -alpha);
         pos.unmake_move(info);
         search_info.depth--;
-        if(score > best_score) {
-            best_score = score;
+        if(score > alpha) {
+            alpha = score;
             best_move = m;
-            if(score > alpha) {
-                alpha = score;
-                flag = TTFlag::TT_EXACT;
-                if(alpha >= beta) {
-                    flag = TTFlag::TT_BETA;
-                    break;
-                }
-                search_info.insert_pv(ply, m);
+            flag = TTFlag::TT_EXACT;
+            if(alpha >= beta) {
+                flag = TTFlag::TT_BETA;
+                break;
             }
+            search_info.insert_pv(ply, m);
         }
     }
-    if(moves_searched == 0) {
-        // Checkmate or Stalemate.
-        return in_check ? mated_in(ply) : VALUE_DRAW;
-    }
-    TT.store(pos, 0, best_score, best_move, flag);
+    TT.store(pos, 0, alpha, best_move, flag);
     return alpha;
 }
 
