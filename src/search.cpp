@@ -51,7 +51,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     MoveList captures;
     generate_moves<GenType::CAPTURE>(pos, captures);
     sort_moves(pos, captures, MOVE_NONE);
-    Value best_score = -VALUE_INF;
+    Value best_score = static_eval;
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
     for(Move m : captures) {
