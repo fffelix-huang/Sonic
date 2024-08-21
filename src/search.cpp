@@ -43,6 +43,11 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
         }
         alpha = std::max(alpha, static_eval);
     }
+    // Delta pruning.
+    const Value DeltaMargin = 850;
+    if(static_eval + DeltaMargin < alpha) {
+        return alpha;
+    }
     MoveList captures;
     generate_moves<GenType::CAPTURE>(pos, captures);
     sort_moves(pos, captures, MOVE_NONE);
