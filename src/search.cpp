@@ -152,6 +152,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     MoveList movelist;
     generate_moves<GenType::ALL>(pos, movelist);
     Move follow_pv_move = (search_info.follow_pv ? search_info.pv[ply][0] : MOVE_NONE);
+    search_info.follow_pv = false;
     sort_moves(pos, movelist, follow_pv_move);
     if(!movelist.empty() && movelist[0] == follow_pv_move) {
         search_info.follow_pv = true;
