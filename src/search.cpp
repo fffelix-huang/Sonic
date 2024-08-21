@@ -123,7 +123,11 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         return qsearch(pos, search_info, alpha, beta);
     }
 
+    // Reverse futility pruning.
     Value eval = (in_check ? VALUE_INF : evaluate(pos));
+    if(!in_check && depth <= 3 && eval - (250 + 70 * depth * depth) >= beta) {
+        return (eval + beta) / 2;
+    }
 
     // Null move pruning.
     Color us = pos.side_to_move();
