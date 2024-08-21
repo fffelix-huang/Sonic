@@ -119,19 +119,16 @@ public:
 
     // Check if insufficient mating material.
     bool insufficient_material() const {
-        if(pieceBB[Color::WHITE][PieceType::PAWN].any() || pieceBB[Color::BLACK][PieceType::PAWN].any()) {
+        if(pieceBB[Color::WHITE][PieceType::PAWN].any() || pieceBB[Color::WHITE][PieceType::KNIGHT].count() > 1 ||
+           pieceBB[Color::WHITE][PieceType::BISHOP].count() > 1 || pieceBB[Color::WHITE][PieceType::ROOK].any() ||
+           pieceBB[Color::WHITE][PieceType::QUEEN].any()
+        ) {
             return false;
         }
-        if(pieceBB[Color::WHITE][PieceType::QUEEN].any() || pieceBB[Color::BLACK][PieceType::QUEEN].any()) {
-            return false;
-        }
-        if(pieceBB[Color::WHITE][PieceType::ROOK].any() || pieceBB[Color::BLACK][PieceType::ROOK].any()) {
-            return false;
-        }
-        if(pieceBB[Color::WHITE][PieceType::BISHOP].count() > 1 || pieceBB[Color::BLACK][PieceType::BISHOP].count() > 1) {
-            return false;
-        }
-        if(pieceBB[Color::WHITE][PieceType::KNIGHT].count() > 1 || pieceBB[Color::BLACK][PieceType::KNIGHT].count() > 1) {
+        if(pieceBB[Color::BLACK][PieceType::PAWN].any() || pieceBB[Color::BLACK][PieceType::KNIGHT].count() > 1 ||
+           pieceBB[Color::BLACK][PieceType::BISHOP].count() > 1 || pieceBB[Color::BLACK][PieceType::ROOK].any() ||
+           pieceBB[Color::BLACK][PieceType::QUEEN].any()
+        ) {
             return false;
         }
         return true;

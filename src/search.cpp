@@ -17,10 +17,14 @@ namespace sonic {
 
 Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     int ply = search_info.depth;
+    bool root_node = (ply == 0);
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
-    if((ply > 0 && pos.is_repetition()) || pos.rule50_ply() >= 100) {
+    if(pos.is_repetition() || pos.insufficient_material()) {
+        return VALUE_DRAW;
+    }
+    if(pos.rule50_ply() >= 100) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {
