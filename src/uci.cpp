@@ -16,11 +16,12 @@
 #include "utils/timer.h"
 #include "book.h"
 #include "search.h"
+#include "version.h"
 
 namespace sonic {
 
 void uci_loop() {
-    std::cout << "Sonic Chess Engine, written by Ting-Hsuan Huang" << std::endl;
+    std::cout << "Sonic Chess Engine " << version_to_string() << " by Ting-Hsuan Huang" << std::endl;
     Position pos;
     SearchInfo search_info;
     Book book;
@@ -51,7 +52,7 @@ void uci_loop() {
         } else if(tokens[0] == "quit") {
             std::exit(0);
         } else if(tokens[0] == "uci") {
-            std::cout << "id name Sonic" << std::endl;
+            std::cout << "id name Sonic " << version_to_string() << std::endl;
             std::cout << "id author Ting-Hsuan Huang" << std::endl;
             std::cout << "option name Book type string default <none>" << std::endl;
             std::cout << "option name Threads type spin default 1 min 1 max 1" << std::endl;
