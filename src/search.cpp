@@ -20,7 +20,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
-    if((ply > 0 && pos.is_repetition()) || pos.rule50_ply() >= 100) {
+    if(pos.is_draw()) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {
@@ -87,7 +87,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
-    if((!root_node && pos.is_repetition()) || pos.rule50_ply() >= 100) {
+    if(!root_node && pos.is_draw()) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {

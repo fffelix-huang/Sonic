@@ -117,6 +117,27 @@ public:
         return false;
     }
 
+    // Check if insufficient mating material.
+    constexpr bool insufficient_material() const {
+        if(pieceBB[Color::WHITE][PieceType::PAWN].any() || pieceBB[Color::WHITE][PieceType::KNIGHT].count() > 1 ||
+           pieceBB[Color::WHITE][PieceType::BISHOP].count() > 1 || pieceBB[Color::WHITE][PieceType::ROOK].any() ||
+           pieceBB[Color::WHITE][PieceType::QUEEN].any()
+        ) {
+            return false;
+        }
+        if(pieceBB[Color::BLACK][PieceType::PAWN].any() || pieceBB[Color::BLACK][PieceType::KNIGHT].count() > 1 ||
+           pieceBB[Color::BLACK][PieceType::BISHOP].count() > 1 || pieceBB[Color::BLACK][PieceType::ROOK].any() ||
+           pieceBB[Color::BLACK][PieceType::QUEEN].any()
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    bool is_draw() const {
+        return rule50 >= 100 || is_repetition() || insufficient_material();
+    }
+
     // Visualize the current position.
     std::string to_string() const;
 
