@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <limits>
 
 #include "chess/all.h"
