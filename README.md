@@ -18,7 +18,7 @@ It will compile the source code into an executable named `sonic`.
 
 | Name | Type | Default | Valid | Description |
 | :--- | :--: | :-----: | :---: | :---------- |
-| `Book` | string | None | `book_name` | Polyglot book file to use. |
+| `Book` | string | None | `<book_name>` | Polyglot book file to use. |
 | `Threads` | integer | $1$ | $[1, 1]$ | Number of threads. |
 | `Hash` | integer | $16$ | $[1, 1024]$ | Transposition table size (in MB). |
 | `Clearhash` | button | | | Clear entries in transposition table. |
@@ -32,13 +32,21 @@ It will compile the source code into an executable named `sonic`.
   - Check Extension
   - Transposition Table
   - Repetition Detection
+  - Insufficient Mating Material
   - Null Move Pruning
   - Aspiration Window
   - Principal Variation Search
   - Mate Distance Pruning
+  - Futility Pruning
+  - Reverse Futility Pruning
+  - Late Move Reduction
+  - Delta Pruning
 - Move Ordering
+  - PV move
   - Pawn Promotion
   - MVV-LVA
 - Evaluation
   - Piece Square Table
   - Passed Pawn Bonus
+  - Piece Mobility
+  - Tapered Evaluation
