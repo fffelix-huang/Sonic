@@ -85,9 +85,12 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
 Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth, bool do_null) {
     int ply = search_info.depth;
     bool root_node = (ply == 0);
+    bool pv_node = (beta - alpha > 1);
+
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
+
     if(!root_node && pos.is_draw()) {
         return VALUE_DRAW;
     }
@@ -107,7 +110,6 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         }
     }
 
-    bool pv_node = (beta - alpha > 1);
     // Check for transposition.
     Move tt_move = MOVE_NONE;
     Value tt_score = TT.probe(pos, ply, depth, alpha, beta, tt_move);
@@ -121,6 +123,12 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     if(in_check) {
         depth++;
     }
+
+    // Internal iterative reduction.
+    if(pv_node && tt_hit && tt_move == MOVE_NONE) {
+        depth -= 2;
+    }
+
     if(depth <= 0) {
         return qsearch(pos, search_info, alpha, beta);
     }
