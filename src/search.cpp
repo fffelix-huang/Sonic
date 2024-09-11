@@ -54,6 +54,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     sort_moves(pos, captures, MOVE_NONE);
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
+    int moves_searched = 0;
     for(Move m : captures) {
         UndoInfo info;
         search_info.depth++;
@@ -62,6 +63,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
             search_info.depth--;
             continue;
         }
+        moves_searched++;
         prefetch(TT.entry_address(pos.hashkey()));
         Value score = -qsearch(pos, search_info, -beta, -alpha);
         pos.unmake_move(info);
@@ -77,7 +79,11 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
             search_info.insert_pv(ply, m);
         }
     }
+    if(moves_searched == 0) {
+        return mated_in(ply);
+    }
     TT.store(pos, 0, alpha, best_move, flag);
+    //std::cout << "qsearch " << pos.fen() << " store alpha " << alpha << " " << ply << std::endl;
     return alpha;
 }
 
@@ -125,7 +131,8 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     }
 
     // Internal iterative reduction.
-    if(pv_node && !tt_hit && depth >= 5) {
+    //std::cout << pos.fen() << " ply = " << ply << " " << depth << std::endl;
+    if(pv_node && !tt_hit) {
         depth -= 2;
     }
 
