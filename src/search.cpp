@@ -125,7 +125,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     }
 
     // Internal iterative reduction.
-    if(!root_node && pv_node && tt_hit && tt_move == MOVE_NONE) {
+    if(pv_node && !tt_hit && depth >= 5) {
         depth -= 2;
     }
 
