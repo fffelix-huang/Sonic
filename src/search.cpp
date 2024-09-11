@@ -18,42 +18,54 @@ namespace sonic {
 
 Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     int ply = search_info.depth;
+
     search_info.nodes++;
     search_info.seldepth = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
+
     if(pos.is_draw()) {
         return VALUE_DRAW;
     }
     if(search_info.time_out()) {
         return VALUE_NONE;
     }
+
     // Check for transposition.
     Move tt_move = MOVE_NONE;
     Value tt_score = TT.probe(pos, ply, 0, alpha, beta, tt_move);
     if(ply > 0 && tt_score != VALUE_NONE) {
         return tt_score;
     }
-    Value static_eval = evaluate(pos);
+
+    bool in_check = pos.in_check();
+    Value static_eval = (in_check ? -VALUE_INF : evaluate(pos));
     if(ply > MAX_DEPTH - 1) {
         return static_eval;
     }
-    bool in_check = pos.in_check();
+
+    Move best_move = MOVE_NONE;
+    TTFlag flag = TTFlag::TT_ALPHA;
+
     if(!in_check) {
         if(static_eval >= beta) {
             return static_eval;
         }
-        alpha = std::max(alpha, static_eval);
+        if(static_eval > alpha) {
+            alpha = static_eval;
+            flag = TTFlag::TT_EXACT;
+        }
     }
+
     // Delta pruning.
     const Value DeltaMargin = 850;
     if(static_eval + DeltaMargin < alpha) {
         return alpha;
     }
+
     MoveList captures;
     generate_moves<GenType::CAPTURE>(pos, captures);
     sort_moves(pos, captures, MOVE_NONE);
-    Move best_move = MOVE_NONE;
-    TTFlag flag = TTFlag::TT_ALPHA;
+
     int moves_searched = 0;
     for(Move m : captures) {
         UndoInfo info;
@@ -79,10 +91,11 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
             search_info.insert_pv(ply, m);
         }
     }
-    if(moves_searched == 0) {
+    if(in_check && moves_searched == 0) {
         return mated_in(ply);
     }
     TT.store(pos, 0, alpha, best_move, flag);
+    assert(alpha > -VALUE_INF && alpha < VALUE_INF);
     //std::cout << "qsearch " << pos.fen() << " store alpha " << alpha << " " << ply << std::endl;
     return alpha;
 }
