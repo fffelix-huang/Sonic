@@ -62,12 +62,16 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
         return alpha;
     }
 
-    MoveList captures;
-    generate_moves<GenType::CAPTURE>(pos, captures);
-    sort_moves(pos, captures, MOVE_NONE);
+    MoveList movelist;
+    if(in_check) {
+        generate_moves<GenType::ALL>(pos, movelist);
+    } else {
+        generate_moves<GenType::CAPTURE>(pos, movelist);
+    }
+    sort_moves(pos, movelist, MOVE_NONE);
 
     int moves_searched = 0;
-    for(Move m : captures) {
+    for(Move m : movelist) {
         UndoInfo info;
         search_info.depth++;
         if(!pos.make_move(m, info)) {
