@@ -126,7 +126,11 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     }
 
     // Reverse futility pruning.
-    Value eval = (in_check ? VALUE_INF : evaluate(pos));
+    Value eval = VALUE_INF;
+    if(!in_check) {
+        // Use evaluation stored in TT.
+        eval = (tt_hit ? tt_score : evaluate(pos));
+    }
     if(!in_check && depth <= 3 && eval - (250 + 70 * depth * depth) >= beta) {
         return (eval + beta) / 2;
     }
