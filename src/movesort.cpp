@@ -5,10 +5,10 @@
 
 namespace sonic {
 
-void sort_moves(const Position& pos, MoveList& movelist, Move follow_pv_move) {
+void sort_moves(const Position& pos, MoveList& movelist, Move tt_move) {
     auto move_score = [&](Move m) -> int {
-        // 1. PV move
-        if(m == follow_pv_move) {
+        // 1. TT move
+        if(m == tt_move) {
             return 1000000;
         }
         // 2. Promotions
