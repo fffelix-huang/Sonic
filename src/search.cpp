@@ -27,31 +27,38 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     if(search_info.time_out()) {
         return VALUE_NONE;
     }
+
     // Check for transposition.
     Move tt_move = MOVE_NONE;
     Value tt_score = TT.probe(pos, ply, 0, alpha, beta, tt_move);
-    if(ply > 0 && tt_score != VALUE_NONE) {
+    bool tt_hit = (tt_score != VALUE_NONE);
+    if(ply > 0 && tt_hit) {
         return tt_score;
     }
-    Value static_eval = evaluate(pos);
+
+    Value eval = (tt_hit ? tt_score : evaluate(pos));
     if(ply > MAX_DEPTH - 1) {
-        return static_eval;
+        return eval;
     }
+
     bool in_check = pos.in_check();
     if(!in_check) {
-        if(static_eval >= beta) {
-            return static_eval;
+        if(eval >= beta) {
+            return eval;
         }
-        alpha = std::max(alpha, static_eval);
+        alpha = std::max(alpha, eval);
     }
+
     // Delta pruning.
     const Value DeltaMargin = 850;
-    if(static_eval + DeltaMargin < alpha) {
+    if(eval + DeltaMargin < alpha) {
         return alpha;
     }
+
     MoveList captures;
     generate_moves<GenType::CAPTURE>(pos, captures);
     sort_moves(pos, captures, MOVE_NONE);
+
     Move best_move = MOVE_NONE;
     TTFlag flag = TTFlag::TT_ALPHA;
     for(Move m : captures) {
@@ -125,10 +132,15 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         return qsearch(pos, search_info, alpha, beta);
     }
 
-    // Reverse futility pruning.
-    Value eval = (in_check ? VALUE_INF : evaluate(pos));
-    if(!in_check && depth <= 3 && eval - (250 + 70 * depth * depth) >= beta) {
-        return (eval + beta) / 2;
+    Value eval = VALUE_INF;
+    if(!in_check) {
+        // Use evaluation stored in TT.
+        eval = (tt_hit ? tt_score : evaluate(pos));
+
+        // Reverse futility pruning.
+        if(depth <= 3 && eval - (250 + 70 * depth * depth) >= beta) {
+            return (eval + beta) / 2;
+        }
     }
 
     // Null move pruning.
