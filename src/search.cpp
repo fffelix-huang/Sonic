@@ -12,6 +12,7 @@
 #include "evaluate.h"
 #include "movesort.h"
 #include "tt.h"
+#include "tune.h"
 #include "types.h"
 #include "uci.h"
 
@@ -51,8 +52,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     }
 
     // Delta pruning.
-    const Value DeltaMargin = 850;
-    if(eval + DeltaMargin < alpha) {
+    if(eval + DELTA_MARGIN < alpha) {
         return alpha;
     }
 
@@ -139,7 +139,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         eval = (tt_hit ? tt_score : evaluate(pos));
 
         // Reverse futility pruning.
-        if(depth <= 3 && eval - (250 + 70 * depth * depth) >= beta) {
+        if(depth <= 3 && eval - (RFP_BASE + 70 * depth * depth) >= beta) {
             return (eval + beta) / 2;
         }
     }

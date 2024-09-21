@@ -23,8 +23,8 @@ namespace sonic {
 OptionsMap init_options_map() {
     OptionsMap options;
     options.add_option("Book", "string", "<none>");
-    options.add_option("Hash", "spin", "16", 1, 1024);
-    options.add_option("Threads", "spin", "1", 1, 1); // Doesn't support multi-threading currently.
+    options.add_option("Hash", "spin", 16, 1, 1024);
+    options.add_option("Threads", "spin", 1, 1, 1); // Doesn't support multi-threading currently.
     options.add_option("ClearHash", "button", [&]() -> void { TT.clear(); });
     return options;
 }
@@ -85,6 +85,8 @@ void uci_loop() {
             }
         } else if(tokens[0] == "d") {
             std::cout << pos.to_string() << std::endl;
+        } else if(tokens[0] == "tune") {
+            options.print_tune_params();
         } else {
             std::cout << "Unknown Command: " << cmd << std::endl;
         }
