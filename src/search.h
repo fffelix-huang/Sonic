@@ -11,7 +11,6 @@
 
 #include "chess/all.h"
 #include "utils/timer.h"
-#include "book.h"
 #include "tt.h"
 #include "types.h"
 
@@ -58,6 +57,6 @@ struct SearchInfo {
     }
 };
 
-void search(Position& pos, SearchInfo& search_info, const Book& book);
+void search(Position& pos, SearchInfo& search_info);
 
 } // namespace sonic

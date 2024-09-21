@@ -13,6 +13,7 @@
 #include "movesort.h"
 #include "tt.h"
 #include "types.h"
+#include "uci.h"
 
 namespace sonic {
 
@@ -225,8 +226,12 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
     return alpha;
 }
 
-void search(Position& pos, SearchInfo& search_info, const Book& book) {
+void search(Position& pos, SearchInfo& search_info) {
+    // Update TT size.
+    TT.resize(int(options["Hash"]));
+
     // Search for book move.
+    Book book(options["Book"]);
     Move best_move = book.book_move(pos);
     if(best_move != MOVE_NONE) {
         std::cout << "info book move" << std::endl;

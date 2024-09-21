@@ -84,7 +84,7 @@ void run_bench() {
         parse_go(pos, search_info, go_params);
         TT.clear();
         std::cout << "Position [" << i + 1 << "/" << bench_positions.size() << "]" << " (" << pos.fen() << ")" << std::endl;
-        search(pos, search_info, Book());
+        search(pos, search_info);
         node_count += search_info.nodes;
         std::cout << "\n";
     }

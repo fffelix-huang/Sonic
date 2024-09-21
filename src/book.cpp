@@ -11,7 +11,9 @@ namespace sonic {
 
 void Book::open(const std::string& file) {
     book = fopen(file.c_str(), "rb+");
-    assert(book != NULL);
+    if(book == NULL) {
+        return;
+    }
     fseek(book, 0, SEEK_END);
     book_size = ftell(book) / 16;
 }
