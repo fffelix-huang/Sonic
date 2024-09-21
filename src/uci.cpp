@@ -14,17 +14,27 @@
 #include "chess/all.h"
 #include "utils/strings.h"
 #include "utils/timer.h"
-#include "book.h"
 #include "search.h"
+#include "ucioption.h"
 #include "version.h"
 
 namespace sonic {
+
+OptionsMap init_options_map() {
+    OptionsMap options;
+    options.add_option("Book", "string", "<none>");
+    options.add_option("Hash", "spin", "16", 1, 1024);
+    options.add_option("Threads", "spin", "1", 1, 1); // Doesn't support multi-threading currently.
+    options.add_option("ClearHash", "button", [&]() -> void { TT.clear(); });
+    return options;
+}
+
+OptionsMap options = init_options_map();
 
 void uci_loop() {
     std::cout << "Sonic Chess Engine " << version_to_string() << " by Ting-Hsuan Huang" << std::endl;
     Position pos;
     SearchInfo search_info;
-    Book book;
     std::string cmd;
     std::thread th;
     while(std::getline(std::cin, cmd)) {
@@ -34,30 +44,19 @@ void uci_loop() {
         std::vector<std::string> tokens = split_string(cmd, ' ');
         if(tokens[0] == "setoption") {
             assert(tokens[1] == "name");
-            if(tokens[2] == "Book") {
+            if(tokens.size() == 3) {
+                // Button
+                options.button(tokens[2]);
+            } else if(tokens.size() == 5) {
                 assert(tokens[3] == "value");
-                book.open(tokens[4]);
-            } else if(tokens[2] == "Hash") {
-                assert(tokens[3] == "value");
-                int mb = stoi(tokens[4]);
-                mb = std::clamp(mb, 1, 1024);
-                TT.resize(mb);
-            } else if(tokens[2] == "ClearHash") {
-                TT.clear();
-            } else if(tokens[2] == "Threads") {
-                // Doesn't support multi-threading currently.
-            } else {
-                std::cout << "Unknown option." << std::endl;
+                options.set(tokens[2], tokens[4]);
             }
         } else if(tokens[0] == "quit") {
             std::exit(0);
         } else if(tokens[0] == "uci") {
             std::cout << "id name Sonic " << version_to_string() << std::endl;
             std::cout << "id author Ting-Hsuan Huang" << std::endl;
-            std::cout << "option name Book type string default <none>" << std::endl;
-            std::cout << "option name Threads type spin default 1 min 1 max 1" << std::endl;
-            std::cout << "option name Hash type spin default 16 min 1 max 1024" << std::endl;
-            std::cout << "option name ClearHash type button" << std::endl;
+            std::cout << options << std::endl;
             std::cout << "uciok" << std::endl;
         } else if(tokens[0] == "isready") {
             std::cout << "readyok" << std::endl;
@@ -78,7 +77,7 @@ void uci_loop() {
                 th.join();
             }
             parse_go(pos, search_info, tokens);
-            th = std::thread(search, std::ref(pos), std::ref(search_info), book);
+            th = std::thread(search, std::ref(pos), std::ref(search_info));
         } else if(tokens[0] == "stop") {
             search_info.stop = true;
             if(th.joinable()) {
