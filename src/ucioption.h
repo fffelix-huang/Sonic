@@ -5,10 +5,9 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <vector>
-
-#include "tune.h"
 
 namespace sonic {
 
@@ -47,21 +46,26 @@ struct Option {
 };
 
 class OptionsMap {
+    using ParamData = std::tuple<std::string, int*, int, int>;
+
 public:
     void add_option(std::string name, std::string type) { options[name] = Option(name, type); }
     void add_option(std::string name, std::string type, std::function<void(void)> button) { options[name] = Option(name, type, button); }
     void add_option(std::string name, std::string type, std::string default_value) { options[name] = Option(name, type, default_value); }
     void add_option(std::string name, std::string type, int default_value, int min, int max) { options[name] = Option(name, type, default_value, min, max); }
 
-    void add_tune_option(TunableParam& param) {
-        tune_params.push_back(&param);
+    void add_tune_option(std::string name, int* val, int min, int max) {
+        tune_params.push_back(std::make_tuple(name, val, min, max));
     }
 
     void print_tune_params() {
-        for(auto param_ptr : tune_params) {
-            auto& param = *param_ptr;
-            std::cout << param.name << ", int, " << param.value << ", " << param.min << ", " << param.max << ", ";
-            std::cout << std::max((param.max - param.min) / 20.0, 0.5) << ", 0.002" << std::endl;
+        for(auto data : tune_params) {
+            std::string name;
+            int* value_ptr;
+            int min, max;
+            std::tie(name, value_ptr, min, max) = data;
+            std::cout << name << ", int, " << *value_ptr << ", " << min << ", " << max << ", ";
+            std::cout << std::max((max - min) / 20.0, 0.5) << ", 0.002" << std::endl;
         }
     }
 
@@ -92,9 +96,9 @@ public:
     }
 
     void set_tune_param(const std::string& name, int value) {
-        for(auto param_ptr : tune_params) {
-            if(param_ptr->name == name) {
-                param_ptr->value = value;
+        for(auto data : tune_params) {
+            if(std::get<0>(data) == name) {
+                *std::get<1>(data) = value;
                 return;
             }
         }
@@ -120,7 +124,7 @@ public:
     }
 
 private:
-    std::vector<TunableParam*> tune_params;
+    std::vector<ParamData> tune_params;
     std::unordered_map<std::string, Option> options;
 };
     

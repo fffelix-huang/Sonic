@@ -50,6 +50,9 @@ void uci_loop() {
             } else if(tokens.size() == 5) {
                 assert(tokens[3] == "value");
                 options.set(tokens[2], tokens[4]);
+                if(tokens[2] == "Hash") {
+                    TT.resize(int(options["Hash"]));
+                }
             }
         } else if(tokens[0] == "quit") {
             std::exit(0);

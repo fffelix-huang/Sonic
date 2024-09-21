@@ -180,7 +180,7 @@ Value negamax(Position& pos, SearchInfo& search_info, Value alpha, Value beta, i
         bool gives_check = pos.in_check();
         if(!root_node) {
             // Futility pruning.
-            Value futility_margin = 175 + 125 * depth;
+            Value futility_margin = FP_BASE + 125 * depth;
             if(!in_check && depth <= 2 && is_quiet && !gives_check && eval + futility_margin < alpha) {
                 pos.unmake_move(info);
                 search_info.depth--;
