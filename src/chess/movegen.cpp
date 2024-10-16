@@ -263,6 +263,21 @@ void generate_moves(const Position& pos, MoveList& movelist) {
     generate_queen_moves<Type>(pos, movelist);
     generate_king_moves<Type>(pos, movelist);
 }
+uint64_t perft(Position& pos, int depth) {
+    if (depth == 0) {
+        return 1; 
+    }
+    MoveList moves;
+    generate_moves<GenType::ALL>(pos, moves); 
+    
+    uint64_t nodes = 0;
+    for (const Move& move : moves) {
+        pos.do_move(move); 
+        nodes += perft(pos, depth - 1); 
+        pos.undo_move(); 
+    }
+    return nodes;
+}
 
 template void generate_moves<GenType::CAPTURE>(const Position& pos, MoveList& movelist);
 template void generate_moves<GenType::NON_CAPTURE>(const Position& pos, MoveList& movelist);
