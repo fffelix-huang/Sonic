@@ -31,7 +31,7 @@ It will compile the source code into an executable named `sonic`.
 
 Sonic includes a variety of advanced chess engine features:
 
-### Search Algorithms
+### 👓Search Algorithms
 - Alpha-Beta Search
 - Quiescence Search
 - Iterative Deepening
