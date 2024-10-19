@@ -11,13 +11,17 @@ extern OptionsMap options;
 
 struct TunableParam {
     TunableParam() {}
-    TunableParam(std::string name_, int value_, int min_, int max_) : name(name_), value(value_), min(min_), max(max_) {
+    TunableParam(std::string name_, int value_, int min_, int max_) :
+        name(name_),
+        value(value_),
+        min(min_),
+        max(max_) {
         options.add_tune_option(name, &value, min, max);
     }
 
     std::string name;
-    int value;
-    int min, max;
+    int         value;
+    int         min, max;
 
     operator int() const { return value; }
 };
@@ -30,4 +34,4 @@ TUNE_PARAM(RFP_MULTIPLIER, 70, 20, 500);
 TUNE_PARAM(FP_BASE, 175, 50, 900);
 TUNE_PARAM(FP_MULTIPLIER, 125, 20, 500);
 
-} // namespace sonic
+}  // namespace sonic

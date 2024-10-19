@@ -9,12 +9,13 @@ namespace sonic {
 
 template<class T, std::size_t N>
 class SmallVector {
-public:
+   public:
     using iterator = typename std::array<T, N>::iterator;
 
     SmallVector() = default;
 
-    SmallVector(std::size_t n) : sz(n) {
+    SmallVector(std::size_t n) :
+        sz(n) {
         assert(n <= N);
     }
 
@@ -36,17 +37,15 @@ public:
         sz--;
     }
 
-    void resize(std::size_t i) {
-        sz = i;
-    }
+    void resize(std::size_t i) { sz = i; }
 
     bool contains(const T& x) const {
         return std::find(data.begin(), data.begin() + sz, x) != data.begin() + sz;
     }
 
-    constexpr void clear() { sz = 0; }
+    constexpr void        clear() { sz = 0; }
     constexpr std::size_t size() const { return sz; }
-    constexpr bool empty() const { return sz == 0; }
+    constexpr bool        empty() const { return sz == 0; }
 
     T& operator[](std::size_t i) {
         assert(i < sz);
@@ -62,10 +61,10 @@ public:
     auto end() { return data.begin() + static_cast<std::ptrdiff_t>(sz); }
     auto begin() const { return data.begin(); }
     auto end() const { return data.begin() + static_cast<std::ptrdiff_t>(sz); }
-    
-private:
+
+   private:
     std::array<T, N> data = {};
-    std::size_t sz = 0;
+    std::size_t      sz   = 0;
 };
 
-} // namespace sonic
+}  // namespace sonic
