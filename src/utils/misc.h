@@ -4,4 +4,4 @@ namespace sonic {
 
 void prefetch(const void* addr);
 
-} // namespace sonic
+}  // namespace sonic

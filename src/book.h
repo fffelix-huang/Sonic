@@ -8,12 +8,10 @@
 namespace sonic {
 
 class Book {
-public:
+   public:
     Book() {}
 
-    Book(const std::string& file) {
-        open(file);
-    }
+    Book(const std::string& file) { open(file); }
 
     struct Entry {
         std::uint64_t key;
@@ -31,12 +29,12 @@ public:
     // Select a random book move.
     Move book_move(const Position& pos) const;
 
-private:
-    int find_key(std::uint64_t key) const;
+   private:
+    int   find_key(std::uint64_t key) const;
     Entry read_entry(int pos) const;
 
-    FILE* book = NULL;
-    int book_size = 0;
+    FILE* book      = NULL;
+    int   book_size = 0;
 };
 
-} // namespace sonic
+}  // namespace sonic

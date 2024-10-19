@@ -20,8 +20,6 @@ constexpr int popcount(std::uint64_t num) {
 #endif
 }
 
-constexpr int lsb(std::uint64_t num) {
-    return __builtin_ctzll(num);
-}
+constexpr int lsb(std::uint64_t num) { return __builtin_ctzll(num); }
 
-} // namespace sonic
+}  // namespace sonic
