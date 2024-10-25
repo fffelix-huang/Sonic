@@ -31,19 +31,13 @@ enum Rank : std::uint8_t {
     RANK_8 = 7
 };
 
+// clang-format off
 #define ENABLE_INCR_DECR_OPERATORS(T) \
     constexpr T& operator++(T& d) { return d = T(std::uint8_t(d) + 1); } \
     constexpr T& operator--(T& d) { return d = T(std::uint8_t(d) - 1); } \
-    constexpr T  operator++(T& d, int) { \
-        T tmp = d; \
-        ++d; \
-        return tmp; \
-    } \
-    constexpr T operator--(T& d, int) { \
-        T tmp = d; \
-        --d; \
-        return tmp; \
-    }
+    constexpr T operator++(T& d, int) { T tmp = d; ++d; return tmp; } \
+    constexpr T operator--(T& d, int) { T tmp = d; --d; return tmp; } \
+// clang-format off
 
 ENABLE_INCR_DECR_OPERATORS(File)
 ENABLE_INCR_DECR_OPERATORS(Rank)
