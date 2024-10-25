@@ -211,30 +211,29 @@ constexpr std::uint64_t ZobristKeys[781] = {
     0x31D71DCE64B2C310ULL, 0xF165B587DF898190ULL, 0xA57E6339DD2CF3A0ULL, 0x1EF6E6DBB1961EC9ULL,
     0x70CC73D90BC26E24ULL, 0xE21A6B35DF0C3AD7ULL, 0x003A93D8B2806962ULL, 0x1C99DED33CB890A1ULL,
     0xCF3145DE0ADD4289ULL, 0xD0E4427A5514FB72ULL, 0x77C621CC9FB3A483ULL, 0x67A34DAC4356550BULL,
-    0xF8D626AAAF278509ULL
-};
- 
+    0xF8D626AAAF278509ULL};
+
 constexpr std::uint64_t zobrist_key(Square sq, Piece p) {
-    if(p == Piece::NO_PIECE) {
+    if (p == Piece::NO_PIECE) {
         return 0LL;
     }
-    int piece_id = (color(p) ^ 1) + type(p) * 2;
+    int piece_id  = (color(p) ^ 1) + type(p) * 2;
     int sq_offset = 8 * static_cast<int>(sq.rank()) + static_cast<int>(sq.file());
     return ZobristKeys[64 * piece_id + sq_offset];
 }
 
 constexpr std::uint64_t zobrist_key(Castling c) {
     std::uint64_t key = 0;
-    if(c.white_can_00()) {
+    if (c.white_can_00()) {
         key ^= ZobristKeys[768];
     }
-    if(c.white_can_000()) {
+    if (c.white_can_000()) {
         key ^= ZobristKeys[769];
     }
-    if(c.black_can_00()) {
+    if (c.black_can_00()) {
         key ^= ZobristKeys[770];
     }
-    if(c.black_can_000()) {
+    if (c.black_can_000()) {
         key ^= ZobristKeys[771];
     }
     return key;
@@ -244,8 +243,6 @@ constexpr std::uint64_t zobrist_key(Square sq) {
     return sq == SQ_NONE ? 0ULL : ZobristKeys[772 + static_cast<int>(sq.file())];
 }
 
-constexpr std::uint64_t zobrist_key(Color c) {
-    return c == Color::WHITE ? ZobristKeys[780] : 0ULL;
-}
+constexpr std::uint64_t zobrist_key(Color c) { return c == Color::WHITE ? ZobristKeys[780] : 0ULL; }
 
 } // namespace sonic

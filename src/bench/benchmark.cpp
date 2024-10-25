@@ -49,17 +49,17 @@ std::vector<std::string> bench_positions = {
     "4rrk1/1p1nq3/p7/2p1P1pp/3P2bp/3Q1Bn1/PPPB4/1K2R1NR w - - 40 21",
     "r3k2r/3nnpbp/q2pp1p1/p7/Pp1PPPP1/4BNN1/1P5P/R2Q1RK1 w kq - 0 16",
     "3Qb1k1/1r2ppb1/pN1n2q1/Pp1Pp1Pr/4P2p/4BP2/4B1R1/1R5K b - - 11 40",
-    "4k3/3q1r2/1N2r1b1/3ppN2/2nPP3/1B1R2n1/2R1Q3/3K4 w - - 5 1",    
+    "4k3/3q1r2/1N2r1b1/3ppN2/2nPP3/1B1R2n1/2R1Q3/3K4 w - - 5 1",
     // 5-man positions
-    "8/8/8/8/5kp1/P7/8/1K1N4 w - - 0 1",     // Kc2 - mate
-    "8/8/8/5N2/8/p7/8/2NK3k w - - 0 1",      // Na2 - mate
-    "8/3k4/8/8/8/4B3/4KB2/2B5 w - - 0 1",    // draw    
+    "8/8/8/8/5kp1/P7/8/1K1N4 w - - 0 1",  // Kc2 - mate
+    "8/8/8/5N2/8/p7/8/2NK3k w - - 0 1",   // Na2 - mate
+    "8/3k4/8/8/8/4B3/4KB2/2B5 w - - 0 1", // draw
     // 6-man positions
-    "8/8/1P6/5pr1/8/4R3/7k/2K5 w - - 0 1",   // Re5 - mate
-    "8/2p4P/8/kr6/6R1/8/8/1K6 w - - 0 1",    // Ka2 - mate
-    "8/8/3P3k/8/1p6/8/1P6/1K3n2 b - - 0 1",  // Nd2 - draw  
+    "8/8/1P6/5pr1/8/4R3/7k/2K5 w - - 0 1",  // Re5 - mate
+    "8/2p4P/8/kr6/6R1/8/8/1K6 w - - 0 1",   // Ka2 - mate
+    "8/8/3P3k/8/1p6/8/1P6/1K3n2 b - - 0 1", // Nd2 - draw
     // 7-man positions
-    "8/R7/2q5/8/6k1/8/1P5p/K6R w - - 0 124", // Draw    
+    "8/R7/2q5/8/6k1/8/1P5p/K6R w - - 0 124", // Draw
     // Mate and stalemate positions
     "6k1/3b3r/1p1p4/p1n2p2/1PPNpP1q/P3Q1p1/1R1RB1P1/5K2 b - - 0 1",
     "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1",
@@ -72,18 +72,19 @@ std::vector<std::string> bench_positions = {
 namespace sonic {
 
 void run_bench() {
-    const std::vector<std::string> go_params = {"go", "depth", "6"};
-    std::uint64_t node_count = 0;
-    TimePoint start = current_time();
-    Position pos;
-    SearchInfo search_info;
-    for(size_t i = 0; i < bench_positions.size(); i++) {
-        std::string fen = "position fen " + bench_positions[i];
+    const std::vector<std::string> go_params  = {"go", "depth", "6"};
+    std::uint64_t                  node_count = 0;
+    TimePoint                      start      = current_time();
+    Position                       pos;
+    SearchInfo                     search_info;
+    for (size_t i = 0; i < bench_positions.size(); i++) {
+        std::string              fen    = "position fen " + bench_positions[i];
         std::vector<std::string> params = split_string(fen, ' ');
         parse_position(pos, search_info, params);
         parse_go(pos, search_info, go_params);
         TT.clear();
-        std::cout << "Position [" << i + 1 << "/" << bench_positions.size() << "]" << " (" << pos.fen() << ")" << std::endl;
+        std::cout << "Position [" << i + 1 << "/" << bench_positions.size() << "]"
+                  << " (" << pos.fen() << ")" << std::endl;
         search(pos, search_info);
         node_count += search_info.nodes;
         std::cout << "\n";

@@ -16,6 +16,16 @@ all: $(EXE)
 clean: 
 	$(RM) $(EXE) *.o bench/*.o chess/*.o utils/*.o
 
+.PHONY: format  # Mark `format` as a phony target so it runs each time
+# Set the format command based on the OS
+ifeq ($(OS),Windows_NT)
+format:
+	powershell -Command "Get-ChildItem -Recurse -Include *.cpp, *.h | ForEach-Object { clang-format -i $$_.FullName }"
+else
+format:
+	find . -type f \( -name "*.cpp" -o -name "*.h" \) -exec clang-format -i {} +
+endif
+
 ###
 ### Compiler:
 ###

@@ -14,13 +14,13 @@
 #include "search.h"
 
 int main(int argc, char* argv[]) {
-	using namespace std;
-	using namespace sonic;
-	init_attacks();
-	if(argc > 1 && std::string(argv[1]) == "bench") {
-		run_bench();
-		return 0;
-	}
-	uci_loop();
-	return 0;
+    using namespace std;
+    using namespace sonic;
+    init_attacks();
+    if (argc > 1 && std::string(argv[1]) == "bench") {
+        run_bench();
+        return 0;
+    }
+    uci_loop();
+    return 0;
 }

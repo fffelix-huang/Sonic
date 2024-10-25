@@ -10,9 +10,9 @@ namespace sonic {
 
 template<std::size_t N>
 struct Magic {
-    Bitboard ray_mask;
-    std::uint64_t magic;
-    std::uint64_t shift;
+    Bitboard                ray_mask;
+    std::uint64_t           magic;
+    std::uint64_t           shift;
     std::array<Bitboard, N> attacks;
 
     Bitboard operator()(Bitboard occupied) const {
@@ -22,13 +22,14 @@ struct Magic {
     }
 };
 
-extern Bitboard rook_rays[Square::SQ_NB];
+extern Bitboard    rook_rays[Square::SQ_NB];
 extern Magic<4096> rook_magics[Square::SQ_NB];
-extern Bitboard bishop_rays[Square::SQ_NB];
-extern Magic<512> bishop_magics[Square::SQ_NB];
+extern Bitboard    bishop_rays[Square::SQ_NB];
+extern Magic<512>  bishop_magics[Square::SQ_NB];
 
 void init_attacks();
 
+// clang-format off
 // Magic numbers for rook.
 constexpr std::uint64_t rook_multiplies[Square::SQ_NB] = {
 	0xa8002c000108020ULL, 0x4440200140003000ULL, 0x8080200010011880ULL,
@@ -169,5 +170,6 @@ constexpr Bitboard king_attacks[Square::SQ_NB] = {
 	0xC040C00000000000, 0x0203000000000000, 0x0507000000000000, 0x0A0E000000000000, 0x141C000000000000,
 	0x2838000000000000, 0x5070000000000000, 0xA0E0000000000000, 0x40C0000000000000
 };
+// clang-format on
 
 } // namespace sonic

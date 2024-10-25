@@ -6,6 +6,7 @@
 
 namespace sonic {
 
+// clang-format off
 constexpr std::pair<Value, Value> PieceSquareTable[PieceType::PIECE_NB][Square::SQ_NB] = {
     { // Pawn
         {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
@@ -58,22 +59,24 @@ constexpr std::pair<Value, Value> PieceSquareTable[PieceType::PIECE_NB][Square::
         {2560, 2499}, {2560, 2520}, {2560, 2530}, {2560, 2540}, {2560, 2540}, {2560, 2530}, {2560, 2520}, {2560, 2499},
     },
     { // King
-        {302, 16}, {328, 78}, {276, 108}, {225, 139}, {225, 139}, {276, 108}, {328, 78}, {302, 16},
-        {276, 78}, {302, 139}, {251, 170}, {200, 200}, {200, 200}, {251, 170}, {302, 139}, {276, 78},
+        {302,  16}, {328,  78}, {276, 108}, {225, 139}, {225, 139}, {276, 108}, {328,  78}, {302,  16},
+        {276,  78}, {302, 139}, {251, 170}, {200, 200}, {200, 200}, {251, 170}, {302, 139}, {276,  78},
         {225, 108}, {251, 170}, {200, 200}, {149, 230}, {149, 230}, {200, 200}, {251, 170}, {225, 108},
         {200, 139}, {225, 200}, {175, 230}, {124, 261}, {124, 261}, {175, 230}, {225, 200}, {200, 139},
-        {175, 139}, {200, 200}, {149, 230}, {98, 261}, {98, 261}, {149, 230}, {200, 200}, {175, 139},
-        {149, 108}, {175, 170}, {124, 200}, {72, 230}, {72, 230}, {124, 200}, {175, 170}, {149, 108},
-        {124, 78}, {149, 139}, {98, 170}, {47, 200}, {47, 200}, {98, 170}, {149, 139}, {124, 78},
-        {98, 16}, {124, 78}, {72, 108}, {21, 139}, {21, 139}, {72, 108}, {124, 78}, {98, 16},
+        {175, 139}, {200, 200}, {149, 230}, { 98, 261}, { 98, 261}, {149, 230}, {200, 200}, {175, 139},
+        {149, 108}, {175, 170}, {124, 200}, { 72, 230}, { 72, 230}, {124, 200}, {175, 170}, {149, 108},
+        {124,  78}, {149, 139}, { 98, 170}, { 47, 200}, { 47, 200}, { 98, 170}, {149, 139}, {124,  78},
+        { 98,  16}, {124,  78}, { 72, 108}, { 21, 139}, { 21, 139}, { 72, 108}, {124,  78}, { 98,  16},
     },
 };
+// clang-format off
 
 constexpr std::pair<Value, Value> KnightMobilityMult = {6, 6};
 constexpr std::pair<Value, Value> BishopMobilityMult = {2, 3};
 constexpr std::pair<Value, Value> RookMobilityMult = {3, 6};
 constexpr std::pair<Value, Value> QueenMobilityMult = {2, 7};
 
+// clang-format off
 constexpr Bitboard PassedPawnMask[Color::COLOR_NB][Square::SQ_NB] = {
     // White
     {
@@ -98,49 +101,51 @@ constexpr Bitboard PassedPawnMask[Color::COLOR_NB][Square::SQ_NB] = {
         0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL, 0ULL,
     }
 };
+// clang-format on
 
 Value evaluate(const Position& pos) {
     static constexpr int PieceTypeValues[] = {1, 3, 3, 5, 9};
-    Color us = pos.side_to_move();
-    Bitboard white_pieces = pos.pieces(Color::WHITE);
-    Bitboard black_pieces = pos.pieces(Color::BLACK);
-    Value mid_game_score = 0;
-    Value end_game_score = 0;
-    int phase = 0;
-    int coeff = 1;
-    for(Color c : {Color::WHITE, Color::BLACK}) {
-        for(Square sq : pos.pieces(c)) {
+    Color                us                = pos.side_to_move();
+    Bitboard             white_pieces      = pos.pieces(Color::WHITE);
+    Bitboard             black_pieces      = pos.pieces(Color::BLACK);
+    Value                mid_game_score    = 0;
+    Value                end_game_score    = 0;
+    int                  phase             = 0;
+    int                  coeff             = 1;
+    for (Color c : {Color::WHITE, Color::BLACK}) {
+        for (Square sq : pos.pieces(c)) {
             PieceType pt = type(pos.piece_on(sq));
             mid_game_score += coeff * PieceSquareTable[pt][sq.to_int()].first;
             end_game_score += coeff * PieceSquareTable[pt][sq.to_int()].second;
-            if(pt != PieceType::KING) {
+            if (pt != PieceType::KING) {
                 phase += PieceTypeValues[pt];
             }
             // Piece Mobility Bonus
-            if(pt == PieceType::KNIGHT) {
-                Bitboard to = knight_attacks[sq.to_int()] - (us == Color::WHITE ? white_pieces : black_pieces);
+            if (pt == PieceType::KNIGHT) {
+                Bitboard to = knight_attacks[sq.to_int()]
+                            - (us == Color::WHITE ? white_pieces : black_pieces);
                 int counts = to.count();
                 mid_game_score += coeff * KnightMobilityMult.first * counts;
                 end_game_score += coeff * KnightMobilityMult.second * counts;
             }
-            if(pt == PieceType::BISHOP) {
+            if (pt == PieceType::BISHOP) {
                 Bitboard bishop_attacks = bishop_magics[sq.to_int()](white_pieces | black_pieces);
                 bishop_attacks -= (us == Color::WHITE ? white_pieces : black_pieces);
                 int counts = bishop_attacks.count();
                 mid_game_score += coeff * BishopMobilityMult.first * counts;
                 end_game_score += coeff * BishopMobilityMult.second * counts;
             }
-            if(pt == PieceType::ROOK) {
+            if (pt == PieceType::ROOK) {
                 Bitboard rook_attacks = rook_magics[sq.to_int()](white_pieces | black_pieces);
                 rook_attacks -= (us == Color::WHITE ? white_pieces : black_pieces);
                 int counts = rook_attacks.count();
                 mid_game_score += coeff * RookMobilityMult.first * counts;
                 end_game_score += coeff * RookMobilityMult.second * counts;
             }
-            if(pt == PieceType::QUEEN) {
-                Bitboard rook_attacks = rook_magics[sq.to_int()](white_pieces | black_pieces);
+            if (pt == PieceType::QUEEN) {
+                Bitboard rook_attacks   = rook_magics[sq.to_int()](white_pieces | black_pieces);
                 Bitboard bishop_attacks = bishop_magics[sq.to_int()](white_pieces | black_pieces);
-                Bitboard queen_attacks = rook_attacks | bishop_attacks;
+                Bitboard queen_attacks  = rook_attacks | bishop_attacks;
                 queen_attacks -= (us == Color::WHITE ? white_pieces : black_pieces);
                 int counts = queen_attacks.count();
                 mid_game_score += coeff * QueenMobilityMult.first * counts;
@@ -149,9 +154,9 @@ Value evaluate(const Position& pos) {
         }
         // Passed pawn bonus.
         const Bitboard& opponent_pawns = pos.pieces(other_color(c), PieceType::PAWN);
-        for(Square sq : pos.pieces(c, PieceType::PAWN)) {
+        for (Square sq : pos.pieces(c, PieceType::PAWN)) {
             Bitboard visible_pawns = PassedPawnMask[c][sq.to_int()] & opponent_pawns;
-            if(visible_pawns.empty()) {
+            if (visible_pawns.empty()) {
                 int promotion_rank = (c == Color::WHITE ? 8 : 1);
                 int bonus = 200 - 25 * std::abs(static_cast<int>(sq.rank()) - promotion_rank);
                 mid_game_score += coeff * bonus;

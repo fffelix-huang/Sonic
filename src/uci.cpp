@@ -28,9 +28,9 @@ OptionsMap init_options_map() {
     options.add_option("Book", "string", "<none>");
     options.add_option("Hash", "spin", 16, 1, 1024);
     options.add_option("Threads", "spin", 1, 1, 1); // Multi-threading currently unsupported.
-    options.add_option("ClearHash", "button", [&]() -> void { 
+    options.add_option("ClearHash", "button", [&]() -> void {
         std::lock_guard<std::mutex> lock(mtx); // Thread safety
-        TT.clear(); 
+        TT.clear();
     });
     return options;
 }
@@ -38,9 +38,10 @@ OptionsMap init_options_map() {
 OptionsMap options = init_options_map();
 
 void uci_loop() {
-    std::cout << "Sonic Chess Engine " << version_to_string() << " by Ting-Hsuan Huang" << std::endl;
-    Position pos;
-    SearchInfo search_info;
+    std::cout << "Sonic Chess Engine " << version_to_string() << " by Ting-Hsuan Huang"
+              << std::endl;
+    Position    pos;
+    SearchInfo  search_info;
     std::string cmd;
     std::thread th;
 
@@ -106,12 +107,16 @@ void uci_loop() {
             options.print_tune_params();
         } else {
             std::cout << "Unknown Command: " << cmd << std::endl;
-            std::cout << "Available commands: setoption, quit, uci, isready, ucinewgame, bench, perft, position, go, stop, d, tune." << std::endl;
+            std::cout
+                << "Available commands: setoption, quit, uci, isready, ucinewgame, bench, perft, position, go, stop, d, tune."
+                << std::endl;
         }
     }
 }
 
-void parse_position(Position& pos, SearchInfo& search_info, const std::vector<std::string>& tokens) {
+void parse_position(Position&                       pos,
+                    SearchInfo&                     search_info,
+                    const std::vector<std::string>& tokens) {
     int moves_start = -1;
     if (tokens[1] == "fen") {
         std::string fen;
@@ -135,19 +140,28 @@ void parse_position(Position& pos, SearchInfo& search_info, const std::vector<st
         return;
     }
     for (size_t i = moves_start + 1; i < tokens.size(); i++) {
-        Square from = Square(tokens[i][1] - '1', tokens[i][0] - 'a');
-        Square to = Square(tokens[i][3] - '1', tokens[i][2] - 'a');
+        Square          from      = Square(tokens[i][1] - '1', tokens[i][0] - 'a');
+        Square          to        = Square(tokens[i][3] - '1', tokens[i][2] - 'a');
         Move::Promotion promotion = Move::Promotion::None;
         if (tokens[i].size() == 5) {
             switch (tokens[i][4]) {
-                case 'q': promotion = Move::Promotion::Queen; break;
-                case 'n': promotion = Move::Promotion::Knight; break;
-                case 'r': promotion = Move::Promotion::Rook; break;
-                case 'b': promotion = Move::Promotion::Bishop; break;
-                default: break;
+            case 'q' :
+                promotion = Move::Promotion::Queen;
+                break;
+            case 'n' :
+                promotion = Move::Promotion::Knight;
+                break;
+            case 'r' :
+                promotion = Move::Promotion::Rook;
+                break;
+            case 'b' :
+                promotion = Move::Promotion::Bishop;
+                break;
+            default :
+                break;
             }
         }
-        Move move(from, to, promotion);
+        Move     move(from, to, promotion);
         UndoInfo info;
         assert(pos.make_move(move, info));
     }
@@ -155,7 +169,7 @@ void parse_position(Position& pos, SearchInfo& search_info, const std::vector<st
 
 void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::string>& params) {
     const Color& us = pos.side_to_move();
-    search_info = SearchInfo();
+    search_info     = SearchInfo();
     int time = -1, increment = 0;
     for (size_t i = 1; i < params.size(); i++) {
         if (params[i] == "movetime") {
@@ -185,10 +199,10 @@ void parse_go(Position& pos, SearchInfo& search_info, const std::vector<std::str
         // go infinite
         time = std::numeric_limits<int>::max() / 2;
     }
-    search_info.nodes = 0;
+    search_info.nodes      = 0;
     search_info.start_time = current_time();
-    search_info.max_time = time / 15 + increment / 2;
-    search_info.stop = false;
+    search_info.max_time   = time / 15 + increment / 2;
+    search_info.stop       = false;
 }
 
 } // namespace sonic
