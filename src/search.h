@@ -48,11 +48,9 @@ struct SearchInfo {
 
     std::string pv_to_string() const {
         std::ostringstream os;
-        for (int i = 0; i < pv_length[0]; i++)
-        {
+        for (int i = 0; i < pv_length[0]; i++) {
             os << pv[0][i].to_string();
-            if (i != pv_length[0] - 1)
-            {
+            if (i != pv_length[0] - 1) {
                 os << " ";
             }
         }
@@ -62,4 +60,4 @@ struct SearchInfo {
 
 void search(Position& pos, SearchInfo& search_info);
 
-}  // namespace sonic
+} // namespace sonic

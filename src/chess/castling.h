@@ -57,25 +57,20 @@ class Castling {
     constexpr bool any(Color c) const { return (data & (c == Color::WHITE ? 3 : 12)) != 0; }
 
     std::string to_string() const {
-        if (!any())
-        {
+        if (!any()) {
             return "-";
         }
         std::string res;
-        if (white_can_00())
-        {
+        if (white_can_00()) {
             res += "K";
         }
-        if (white_can_000())
-        {
+        if (white_can_000()) {
             res += "Q";
         }
-        if (black_can_00())
-        {
+        if (black_can_00()) {
             res += "k";
         }
-        if (black_can_000())
-        {
+        if (black_can_000()) {
             res += "q";
         }
         return res;
@@ -89,4 +84,4 @@ class Castling {
     std::uint8_t data = 0;
 };
 
-}  // namespace sonic
+} // namespace sonic

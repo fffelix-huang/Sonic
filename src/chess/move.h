@@ -42,13 +42,11 @@ class Move {
     // Returns the move in UCI format.
     std::string to_string() const {
         // MOVE_NONE
-        if (data == 0)
-        {
+        if (data == 0) {
             return "(none)";
         }
         std::string res = from().to_string() + to().to_string();
-        switch (promotion())
-        {
+        switch (promotion()) {
         case Promotion::None :
             return res;
         case Promotion::Queen :
@@ -82,4 +80,4 @@ class Move {
 
 using MoveList = SmallVector<Move, 218>;
 
-}  // namespace sonic
+} // namespace sonic

@@ -21,4 +21,4 @@ enum GenType {
 template<GenType Type>
 void generate_moves(const Position& pos, MoveList& movelist);
 
-}  // namespace sonic
+} // namespace sonic

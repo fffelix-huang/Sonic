@@ -34,4 +34,4 @@ TUNE_PARAM(RFP_MULTIPLIER, 70, 20, 500);
 TUNE_PARAM(FP_BASE, 175, 50, 900);
 TUNE_PARAM(FP_MULTIPLIER, 125, 20, 500);
 
-}  // namespace sonic
+} // namespace sonic

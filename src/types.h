@@ -23,8 +23,7 @@ constexpr Value mated_in(int ply) { return -VALUE_MATE + ply; }
 
 inline std::string value_to_string(Value score) {
     assert(std::abs(score) <= VALUE_MATE);
-    if (is_mate_value(score))
-    {
+    if (is_mate_value(score)) {
         return std::string("mate ")
              + std::to_string(score > 0 ? (VALUE_MATE - score + 1) / 2 : (-score - VALUE_MATE) / 2);
     }
@@ -47,4 +46,4 @@ constexpr Direction operator+(Direction a, Direction b) { return Direction(int(a
 constexpr Direction operator*(Direction d, int i) { return Direction(i * int(d)); }
 constexpr Direction operator*(int i, Direction d) { return Direction(i * int(d)); }
 
-}  // namespace sonic
+} // namespace sonic

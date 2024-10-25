@@ -60,18 +60,15 @@ class Position {
     bool is_quiet(Move m) const { return !is_capture(m) && m.promotion() == Move::Promotion::None; }
 
     bool has_en_passant_capture() const {
-        if (enPassant == SQ_NONE)
-        {
+        if (enPassant == SQ_NONE) {
             return false;
         }
         Piece my_pawn = (sideToMove == Color::WHITE ? Piece::W_PAWN : Piece::B_PAWN);
         bool  result  = false;
-        if (enPassant.file() != File::FILE_A)
-        {
+        if (enPassant.file() != File::FILE_A) {
             result = result || piece_on(enPassant + Direction::WEST) == my_pawn;
         }
-        if (enPassant.file() != File::FILE_H)
-        {
+        if (enPassant.file() != File::FILE_H) {
             result = result || piece_on(enPassant + Direction::EAST) == my_pawn;
         }
         return result;
@@ -105,10 +102,8 @@ class Position {
 
     // Check if the current position occurs before.
     bool is_repetition() const {
-        for (int i = 2; i < std::min(history_count, rule50); i += 2)
-        {
-            if (history_keys[history_count - i] == key)
-            {
+        for (int i = 2; i < std::min(history_count, rule50); i += 2) {
+            if (history_keys[history_count - i] == key) {
                 return true;
             }
         }
@@ -121,16 +116,14 @@ class Position {
             || pieceBB[Color::WHITE][PieceType::KNIGHT].count() > 1
             || pieceBB[Color::WHITE][PieceType::BISHOP].count() > 1
             || pieceBB[Color::WHITE][PieceType::ROOK].any()
-            || pieceBB[Color::WHITE][PieceType::QUEEN].any())
-        {
+            || pieceBB[Color::WHITE][PieceType::QUEEN].any()) {
             return false;
         }
         if (pieceBB[Color::BLACK][PieceType::PAWN].any()
             || pieceBB[Color::BLACK][PieceType::KNIGHT].count() > 1
             || pieceBB[Color::BLACK][PieceType::BISHOP].count() > 1
             || pieceBB[Color::BLACK][PieceType::ROOK].any()
-            || pieceBB[Color::BLACK][PieceType::QUEEN].any())
-        {
+            || pieceBB[Color::BLACK][PieceType::QUEEN].any()) {
             return false;
         }
         return true;
@@ -143,14 +136,11 @@ class Position {
 
    private:
     void clear_board() {
-        for (int i = 0; i < Square::SQ_NB; i++)
-        {
+        for (int i = 0; i < Square::SQ_NB; i++) {
             board[i] = Piece::NO_PIECE;
         }
-        for (int i = 0; i < Color::COLOR_NB; i++)
-        {
-            for (int j = 0; j < PieceType::PIECE_NB; j++)
-            {
+        for (int i = 0; i < Color::COLOR_NB; i++) {
+            for (int j = 0; j < PieceType::PIECE_NB; j++) {
                 pieceBB[i][j] = Bitboard(0);
             }
         }
@@ -164,8 +154,7 @@ class Position {
 
     void remove_piece(Square sq) {
         Piece p = board[sq.to_int()];
-        if (p != Piece::NO_PIECE)
-        {
+        if (p != Piece::NO_PIECE) {
             board[sq.to_int()] = Piece::NO_PIECE;
             pieceBB[color(p)][type(p)] -= sq;
             key ^= zobrist_key(sq, p);
@@ -184,4 +173,4 @@ class Position {
     int                                  history_count;
 };
 
-}  // namespace sonic
+} // namespace sonic

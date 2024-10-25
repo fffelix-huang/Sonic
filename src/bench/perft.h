@@ -16,4 +16,4 @@ struct PerftTest {
 std::uint64_t perft(Position& pos, int depth);
 void          bench_perft();
 
-}  // namespace sonic
+} // namespace sonic

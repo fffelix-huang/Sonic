@@ -7,4 +7,4 @@ namespace sonic {
 
 Value evaluate(const Position& pos);
 
-}  // namespace sonic
+} // namespace sonic

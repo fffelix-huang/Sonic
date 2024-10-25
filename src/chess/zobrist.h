@@ -214,8 +214,7 @@ constexpr std::uint64_t ZobristKeys[781] = {
   0xF8D626AAAF278509ULL};
 
 constexpr std::uint64_t zobrist_key(Square sq, Piece p) {
-    if (p == Piece::NO_PIECE)
-    {
+    if (p == Piece::NO_PIECE) {
         return 0LL;
     }
     int piece_id  = (color(p) ^ 1) + type(p) * 2;
@@ -225,20 +224,16 @@ constexpr std::uint64_t zobrist_key(Square sq, Piece p) {
 
 constexpr std::uint64_t zobrist_key(Castling c) {
     std::uint64_t key = 0;
-    if (c.white_can_00())
-    {
+    if (c.white_can_00()) {
         key ^= ZobristKeys[768];
     }
-    if (c.white_can_000())
-    {
+    if (c.white_can_000()) {
         key ^= ZobristKeys[769];
     }
-    if (c.black_can_00())
-    {
+    if (c.black_can_00()) {
         key ^= ZobristKeys[770];
     }
-    if (c.black_can_000())
-    {
+    if (c.black_can_000()) {
         key ^= ZobristKeys[771];
     }
     return key;
@@ -250,4 +245,4 @@ constexpr std::uint64_t zobrist_key(Square sq) {
 
 constexpr std::uint64_t zobrist_key(Color c) { return c == Color::WHITE ? ZobristKeys[780] : 0ULL; }
 
-}  // namespace sonic
+} // namespace sonic

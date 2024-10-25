@@ -69,8 +69,7 @@ class Square {
 
     std::string to_string() const {
         // SQ_NONE
-        if (square == 255)
-        {
+        if (square == 255) {
             return std::string("(none)");
         }
         return std::string(1, 'a' + col()) + std::string(1, '1' + row());
@@ -131,10 +130,8 @@ class Bitboard {
 
     std::string to_string() const {
         std::ostringstream os;
-        for (int row = 7; row >= 0; row--)
-        {
-            for (int col = 0; col < 8; col++)
-            {
+        for (int row = 7; row >= 0; row--) {
+            for (int col = 0; col < 8; col++) {
                 os << ".X"[get(row, col)];
             }
             os << "\n";
@@ -236,4 +233,4 @@ class Bitboard {
     std::uint64_t board = 0;
 };
 
-}  // namespace sonic
+} // namespace sonic

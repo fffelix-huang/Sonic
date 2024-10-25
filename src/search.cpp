@@ -23,12 +23,10 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     search_info.nodes++;
     search_info.seldepth       = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
-    if (pos.is_draw())
-    {
+    if (pos.is_draw()) {
         return VALUE_DRAW;
     }
-    if (search_info.time_out())
-    {
+    if (search_info.time_out()) {
         return VALUE_NONE;
     }
 
@@ -36,30 +34,25 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
     Move  tt_move  = MOVE_NONE;
     Value tt_score = TT.probe(pos, ply, 0, alpha, beta, tt_move);
     bool  tt_hit   = (tt_score != VALUE_NONE);
-    if (ply > 0 && tt_hit)
-    {
+    if (ply > 0 && tt_hit) {
         return tt_score;
     }
 
     Value eval = (tt_hit ? tt_score : evaluate(pos));
-    if (ply > MAX_DEPTH - 1)
-    {
+    if (ply > MAX_DEPTH - 1) {
         return eval;
     }
 
     bool in_check = pos.in_check();
-    if (!in_check)
-    {
-        if (eval >= beta)
-        {
+    if (!in_check) {
+        if (eval >= beta) {
             return eval;
         }
         alpha = std::max(alpha, eval);
     }
 
     // Delta pruning.
-    if (eval + DELTA_MARGIN < alpha)
-    {
+    if (eval + DELTA_MARGIN < alpha) {
         return alpha;
     }
 
@@ -69,12 +62,10 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
 
     Move   best_move = MOVE_NONE;
     TTFlag flag      = TTFlag::TT_ALPHA;
-    for (Move m : captures)
-    {
+    for (Move m : captures) {
         UndoInfo info;
         search_info.depth++;
-        if (!pos.make_move(m, info))
-        {
+        if (!pos.make_move(m, info)) {
             pos.unmake_move(info);
             search_info.depth--;
             continue;
@@ -83,13 +74,11 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
         Value score = -qsearch(pos, search_info, -beta, -alpha);
         pos.unmake_move(info);
         search_info.depth--;
-        if (score > alpha)
-        {
+        if (score > alpha) {
             alpha     = score;
             best_move = m;
             flag      = TTFlag::TT_EXACT;
-            if (alpha >= beta)
-            {
+            if (alpha >= beta) {
                 flag = TTFlag::TT_BETA;
                 break;
             }
@@ -108,26 +97,21 @@ Value negamax(
     search_info.nodes++;
     search_info.seldepth       = std::max(search_info.seldepth, ply);
     search_info.pv_length[ply] = 0;
-    if (!root_node && pos.is_draw())
-    {
+    if (!root_node && pos.is_draw()) {
         return VALUE_DRAW;
     }
-    if (search_info.time_out())
-    {
+    if (search_info.time_out()) {
         return VALUE_NONE;
     }
-    if (ply > MAX_DEPTH - 1)
-    {
+    if (ply > MAX_DEPTH - 1) {
         return evaluate(pos);
     }
 
     // Mate distance pruning.
-    if (!root_node)
-    {
+    if (!root_node) {
         alpha = std::max(alpha, mated_in(ply));
         beta  = std::min(beta, mate_in(ply + 1));
-        if (alpha >= beta)
-        {
+        if (alpha >= beta) {
             return alpha;
         }
     }
@@ -137,31 +121,26 @@ Value negamax(
     Move  tt_move  = MOVE_NONE;
     Value tt_score = TT.probe(pos, ply, depth, alpha, beta, tt_move);
     bool  tt_hit   = (tt_score != VALUE_NONE);
-    if (!root_node && tt_hit && !pv_node)
-    {
+    if (!root_node && tt_hit && !pv_node) {
         return tt_score;
     }
 
     // Check extension.
     bool in_check = pos.in_check();
-    if (in_check)
-    {
+    if (in_check) {
         depth++;
     }
-    if (depth <= 0)
-    {
+    if (depth <= 0) {
         return qsearch(pos, search_info, alpha, beta);
     }
 
     Value eval = VALUE_INF;
-    if (!in_check)
-    {
+    if (!in_check) {
         // Use evaluation stored in TT.
         eval = (tt_hit ? tt_score : evaluate(pos));
 
         // Reverse futility pruning.
-        if (depth <= 3 && eval - (RFP_BASE + RFP_MULTIPLIER * depth * depth) >= beta)
-        {
+        if (depth <= 3 && eval - (RFP_BASE + RFP_MULTIPLIER * depth * depth) >= beta) {
             return (eval + beta) / 2;
         }
     }
@@ -170,16 +149,14 @@ Value negamax(
     Color us = pos.side_to_move();
     bool  has_big_piece =
       (pos.pieces(us) - pos.pieces(us, PieceType::KING) - pos.pieces(us, PieceType::PAWN)).any();
-    if (do_null && !in_check && has_big_piece && search_info.depth > 0 && depth >= 3)
-    {
+    if (do_null && !in_check && has_big_piece && search_info.depth > 0 && depth >= 3) {
         UndoInfo info;
         search_info.depth++;
         pos.make_null_move(info);
         Value null_score = -negamax(pos, search_info, -beta, -beta + 1, depth - 1 - 2, false);
         pos.unmake_null_move(info);
         search_info.depth--;
-        if (null_score >= beta)
-        {
+        if (null_score >= beta) {
             return beta;
         }
     }
@@ -192,26 +169,22 @@ Value negamax(
     Move   best_move      = MOVE_NONE;
     TTFlag flag           = TTFlag::TT_ALPHA;
     int    moves_searched = 0;
-    for (Move m : movelist)
-    {
+    for (Move m : movelist) {
         bool     is_quiet = pos.is_quiet(m);
         UndoInfo info;
         search_info.depth++;
-        if (!pos.make_move(m, info))
-        {
+        if (!pos.make_move(m, info)) {
             pos.unmake_move(info);
             search_info.depth--;
             continue;
         }
         moves_searched++;
         bool gives_check = pos.in_check();
-        if (!root_node)
-        {
+        if (!root_node) {
             // Futility pruning.
             Value futility_margin = FP_BASE + FP_MULTIPLIER * depth;
             if (!in_check && depth <= 2 && is_quiet && !gives_check
-                && eval + futility_margin < alpha)
-            {
+                && eval + futility_margin < alpha) {
                 pos.unmake_move(info);
                 search_info.depth--;
                 continue;
@@ -219,36 +192,28 @@ Value negamax(
         }
         prefetch(TT.entry_address(pos.hashkey()));
         Value score = VALUE_NONE;
-        if (moves_searched >= 5 && depth >= 3 && !in_check)
-        {
+        if (moves_searched >= 5 && depth >= 3 && !in_check) {
             score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 2, true);
-        }
-        else
-        {
+        } else {
             // Do search on full-depth.
             score = VALUE_INF;
         }
-        if (score > alpha)
-        {
+        if (score > alpha) {
             // PV search.
             score = -negamax(pos, search_info, -alpha - 1, -alpha, depth - 1, true);
-            if (alpha < score && score < beta)
-            {
+            if (alpha < score && score < beta) {
                 score = -negamax(pos, search_info, -beta, -alpha, depth - 1, true);
             }
         }
         pos.unmake_move(info);
         search_info.depth--;
-        if (score > best_score)
-        {
+        if (score > best_score) {
             best_score = score;
             best_move  = m;
-            if (score > alpha)
-            {
+            if (score > alpha) {
                 alpha = score;
                 flag  = TTFlag::TT_EXACT;
-                if (alpha >= beta)
-                {
+                if (alpha >= beta) {
                     flag = TTFlag::TT_BETA;
                     break;
                 }
@@ -256,8 +221,7 @@ Value negamax(
             }
         }
     }
-    if (moves_searched == 0)
-    {
+    if (moves_searched == 0) {
         // Checkmate or Stalemate.
         return in_check ? mated_in(ply) : VALUE_DRAW;
     }
@@ -272,8 +236,7 @@ void search(Position& pos, SearchInfo& search_info) {
     // Search for book move.
     Book book(options["Book"]);
     Move best_move = book.book_move(pos);
-    if (best_move != MOVE_NONE)
-    {
+    if (best_move != MOVE_NONE) {
         std::cout << "info book move" << std::endl;
         std::cout << "bestmove " << best_move.to_string() << std::endl;
         return;
@@ -281,16 +244,13 @@ void search(Position& pos, SearchInfo& search_info) {
     // Aspiration window.
     Value alpha = -VALUE_INF, beta = VALUE_INF;
     // Iterative deepening.
-    for (int depth = 1; depth <= search_info.max_depth; depth++)
-    {
+    for (int depth = 1; depth <= search_info.max_depth; depth++) {
         search_info.follow_pv = true;
         Value score           = negamax(pos, search_info, alpha, beta, depth, true);
-        if (search_info.time_out())
-        {
+        if (search_info.time_out()) {
             break;
         }
-        if (score <= alpha || score >= beta)
-        {
+        if (score <= alpha || score >= beta) {
             // Research with full window.
             alpha = -VALUE_INF;
             beta  = VALUE_INF;
@@ -312,4 +272,4 @@ void search(Position& pos, SearchInfo& search_info) {
     std::cout << "bestmove " << best_move.to_string() << std::endl;
 }
 
-}  // namespace sonic
+} // namespace sonic

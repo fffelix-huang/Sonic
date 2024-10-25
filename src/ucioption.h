@@ -46,11 +46,9 @@ struct Option {
 
     std::string to_string() const {
         std::string result = std::string("option name ") + name + " type " + type;
-        if (type != "button")
-        {
+        if (type != "button") {
             result += std::string(" default ") + default_value;
-            if (type == "spin")
-            {
+            if (type == "spin") {
                 result +=
                   std::string(" min ") + std::to_string(min) + " max " + std::to_string(max);
             }
@@ -83,8 +81,7 @@ class OptionsMap {
     }
 
     void print_tune_params() {
-        for (auto data : tune_params)
-        {
+        for (auto data : tune_params) {
             std::string name;
             int*        value_ptr;
             int         min, max;
@@ -95,8 +92,7 @@ class OptionsMap {
     }
 
     void button(const std::string& name) {
-        if (options.find(name) == options.end())
-        {
+        if (options.find(name) == options.end()) {
             std::cout << "Unknown option: \"" << name << "\"." << std::endl;
             return;
         }
@@ -105,18 +101,15 @@ class OptionsMap {
     }
 
     void set(const std::string& name, const std::string& value) {
-        if (options.find(name) == options.end())
-        {
+        if (options.find(name) == options.end()) {
             // Search if the option is a tunable param.
             set_tune_param(name, stoi(value));
             return;
         }
         Option& option = options[name];
-        if (option.type == "spin")
-        {
+        if (option.type == "spin") {
             int value_int = stoi(value);
-            if (option.min <= value_int && value_int <= option.max)
-            {
+            if (option.min <= value_int && value_int <= option.max) {
                 option.value = stoi(value);
             }
             return;
@@ -125,10 +118,8 @@ class OptionsMap {
     }
 
     void set_tune_param(const std::string& name, int value) {
-        for (auto data : tune_params)
-        {
-            if (std::get<0>(data) == name)
-            {
+        for (auto data : tune_params) {
+            if (std::get<0>(data) == name) {
                 *std::get<1>(data) = value;
                 return;
             }
@@ -138,8 +129,7 @@ class OptionsMap {
 
     std::string to_string() const {
         std::string result;
-        for (auto p : options)
-        {
+        for (auto p : options) {
             result += p.second.to_string();
             result += "\n";
         }
@@ -158,4 +148,4 @@ class OptionsMap {
     std::unordered_map<std::string, Option> options;
 };
 
-}  // namespace sonic
+} // namespace sonic

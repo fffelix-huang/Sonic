@@ -18,8 +18,8 @@ BreakBeforeBraces: Custom
 BraceWrapping:
   AfterFunction: false 
   AfterClass: false
-  AfterControlStatement: true
-  BeforeElse: true
+  AfterControlStatement: false
+  BeforeElse: false
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: AfterColon
 BreakStringLiterals: false
@@ -41,4 +41,4 @@ SpaceBeforeCaseColon: true
 SpaceBeforeCpp11BracedList: false
 SpaceBeforeInheritanceColon: false
 SpaceInEmptyBlock: false
-SpacesBeforeTrailingComments: 2
+SpacesBeforeTrailingComments: 1

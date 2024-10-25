@@ -85,4 +85,4 @@ constexpr Square SQ_F8 = Square(5 + 56);
 constexpr Square SQ_G8 = Square(6 + 56);
 constexpr Square SQ_H8 = Square(7 + 56);
 
-}  // namespace sonic
+} // namespace sonic

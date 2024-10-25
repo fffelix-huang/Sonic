@@ -47,4 +47,4 @@ class TranspositionTable {
 
 extern TranspositionTable TT;
 
-}  // namespace sonic
+} // namespace sonic

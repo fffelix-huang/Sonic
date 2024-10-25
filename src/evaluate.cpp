@@ -231,44 +231,37 @@ Value evaluate(const Position& pos) {
     Value                end_game_score    = 0;
     int                  phase             = 0;
     int                  coeff             = 1;
-    for (Color c : {Color::WHITE, Color::BLACK})
-    {
-        for (Square sq : pos.pieces(c))
-        {
+    for (Color c : {Color::WHITE, Color::BLACK}) {
+        for (Square sq : pos.pieces(c)) {
             PieceType pt = type(pos.piece_on(sq));
             mid_game_score += coeff * PieceSquareTable[pt][sq.to_int()].first;
             end_game_score += coeff * PieceSquareTable[pt][sq.to_int()].second;
-            if (pt != PieceType::KING)
-            {
+            if (pt != PieceType::KING) {
                 phase += PieceTypeValues[pt];
             }
             // Piece Mobility Bonus
-            if (pt == PieceType::KNIGHT)
-            {
+            if (pt == PieceType::KNIGHT) {
                 Bitboard to =
                   knight_attacks[sq.to_int()] - (us == Color::WHITE ? white_pieces : black_pieces);
                 int counts = to.count();
                 mid_game_score += coeff * KnightMobilityMult.first * counts;
                 end_game_score += coeff * KnightMobilityMult.second * counts;
             }
-            if (pt == PieceType::BISHOP)
-            {
+            if (pt == PieceType::BISHOP) {
                 Bitboard bishop_attacks = bishop_magics[sq.to_int()](white_pieces | black_pieces);
                 bishop_attacks -= (us == Color::WHITE ? white_pieces : black_pieces);
                 int counts = bishop_attacks.count();
                 mid_game_score += coeff * BishopMobilityMult.first * counts;
                 end_game_score += coeff * BishopMobilityMult.second * counts;
             }
-            if (pt == PieceType::ROOK)
-            {
+            if (pt == PieceType::ROOK) {
                 Bitboard rook_attacks = rook_magics[sq.to_int()](white_pieces | black_pieces);
                 rook_attacks -= (us == Color::WHITE ? white_pieces : black_pieces);
                 int counts = rook_attacks.count();
                 mid_game_score += coeff * RookMobilityMult.first * counts;
                 end_game_score += coeff * RookMobilityMult.second * counts;
             }
-            if (pt == PieceType::QUEEN)
-            {
+            if (pt == PieceType::QUEEN) {
                 Bitboard rook_attacks   = rook_magics[sq.to_int()](white_pieces | black_pieces);
                 Bitboard bishop_attacks = bishop_magics[sq.to_int()](white_pieces | black_pieces);
                 Bitboard queen_attacks  = rook_attacks | bishop_attacks;
@@ -280,11 +273,9 @@ Value evaluate(const Position& pos) {
         }
         // Passed pawn bonus.
         const Bitboard& opponent_pawns = pos.pieces(other_color(c), PieceType::PAWN);
-        for (Square sq : pos.pieces(c, PieceType::PAWN))
-        {
+        for (Square sq : pos.pieces(c, PieceType::PAWN)) {
             Bitboard visible_pawns = PassedPawnMask[c][sq.to_int()] & opponent_pawns;
-            if (visible_pawns.empty())
-            {
+            if (visible_pawns.empty()) {
                 int promotion_rank = (c == Color::WHITE ? 8 : 1);
                 int bonus = 200 - 25 * std::abs(static_cast<int>(sq.rank()) - promotion_rank);
                 mid_game_score += coeff * bonus;
@@ -298,4 +289,4 @@ Value evaluate(const Position& pos) {
     return us == Color::WHITE ? score : -score;
 }
 
-}  // namespace sonic
+} // namespace sonic

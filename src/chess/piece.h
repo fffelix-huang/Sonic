@@ -43,8 +43,7 @@ constexpr Color color(Piece p) {
 constexpr PieceType type(Piece p) { return PieceType(p & 7); }
 
 constexpr char to_char(Piece p) {
-    switch (p)
-    {
+    switch (p) {
     case Piece::W_PAWN :
         return 'P';
     case Piece::W_ROOK :
@@ -76,4 +75,4 @@ constexpr char to_char(Piece p) {
     }
 }
 
-}  // namespace sonic
+} // namespace sonic

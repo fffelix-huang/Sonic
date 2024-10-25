@@ -11,4 +11,4 @@ enum Color {
 
 constexpr Color other_color(Color c) { return c == Color::WHITE ? Color::BLACK : Color::WHITE; }
 
-}  // namespace sonic
+} // namespace sonic

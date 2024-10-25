@@ -18,4 +18,4 @@ void prefetch(const void* addr) {
 
 #endif
 
-}  // namespace sonic
+} // namespace sonic

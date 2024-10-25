@@ -37,4 +37,4 @@ class Book {
     int   book_size = 0;
 };
 
-}  // namespace sonic
+} // namespace sonic

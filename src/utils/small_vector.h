@@ -67,4 +67,4 @@ class SmallVector {
     std::size_t      sz   = 0;
 };
 
-}  // namespace sonic
+} // namespace sonic

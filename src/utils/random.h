@@ -12,4 +12,4 @@ inline std::uint64_t rng() {
     return SEED;
 }
 
-}  // namespace sonic
+} // namespace sonic
