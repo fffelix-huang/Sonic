@@ -108,8 +108,8 @@ void uci_loop() {
         } else {
             std::cout << "Unknown Command: " << cmd << std::endl;
             std::cout
-              << "Available commands: setoption, quit, uci, isready, ucinewgame, bench, perft, position, go, stop, d, tune."
-              << std::endl;
+                << "Available commands: setoption, quit, uci, isready, ucinewgame, bench, perft, position, go, stop, d, tune."
+                << std::endl;
         }
     }
 }

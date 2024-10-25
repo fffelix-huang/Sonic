@@ -29,7 +29,7 @@ void TranspositionTable::clear() {
 }
 
 Value TranspositionTable::probe(
-  const Position& pos, int ply, int depth, Value alpha, Value beta, Move& m) const {
+    const Position& pos, int ply, int depth, Value alpha, Value beta, Move& m) const {
     const TTEntry& entry = entries[pos.hashkey() & (size - 1)];
     if (entry.key != pos.hashkey()) {
         return VALUE_NONE;
@@ -58,12 +58,12 @@ Value TranspositionTable::probe(
 }
 
 void TranspositionTable::store(
-  const Position& pos, int depth, Value score, Move move, TTFlag flag) {
+    const Position& pos, int depth, Value score, Move move, TTFlag flag) {
     size_t index = pos.hashkey() & (size - 1);
     assert(index < size);
     TTEntry& entry = entries[index];
     bool     replace =
-      entry.key != pos.hashkey() || entry.depth < depth + 2 || flag == TTFlag::TT_EXACT;
+        entry.key != pos.hashkey() || entry.depth < depth + 2 || flag == TTFlag::TT_EXACT;
     if (!replace) {
         return;
     }

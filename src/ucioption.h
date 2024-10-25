@@ -50,7 +50,7 @@ struct Option {
             result += std::string(" default ") + default_value;
             if (type == "spin") {
                 result +=
-                  std::string(" min ") + std::to_string(min) + " max " + std::to_string(max);
+                    std::string(" min ") + std::to_string(min) + " max " + std::to_string(max);
             }
         }
         return result;

@@ -91,7 +91,7 @@ Value qsearch(Position& pos, SearchInfo& search_info, Value alpha, Value beta) {
 
 // Negamax search with alpha-beta pruning.
 Value negamax(
-  Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth, bool do_null) {
+    Position& pos, SearchInfo& search_info, Value alpha, Value beta, int depth, bool do_null) {
     int  ply       = search_info.depth;
     bool root_node = (ply == 0);
     search_info.nodes++;
@@ -148,7 +148,7 @@ Value negamax(
     // Null move pruning.
     Color us = pos.side_to_move();
     bool  has_big_piece =
-      (pos.pieces(us) - pos.pieces(us, PieceType::KING) - pos.pieces(us, PieceType::PAWN)).any();
+        (pos.pieces(us) - pos.pieces(us, PieceType::KING) - pos.pieces(us, PieceType::PAWN)).any();
     if (do_null && !in_check && has_big_piece && search_info.depth > 0 && depth >= 3) {
         UndoInfo info;
         search_info.depth++;

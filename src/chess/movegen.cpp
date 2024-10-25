@@ -143,7 +143,7 @@ void generate_queen_moves(const Position& pos, MoveList& movelist) {
     Bitboard        queens       = pos.pieces(pos.side_to_move(), PieceType::QUEEN);
     for (Square queen : queens) {
         Bitboard attacks =
-          (rook_magics[queen.to_int()](all_pieces) | bishop_magics[queen.to_int()](all_pieces));
+            (rook_magics[queen.to_int()](all_pieces) | bishop_magics[queen.to_int()](all_pieces));
         attacks -= my_pieces;
         if constexpr (Type != GenType::ALL) {
             if constexpr (Type == GenType::CAPTURE) {

@@ -82,7 +82,7 @@ void init_rook_attacks() {
 
                 // Update magic table.
                 std::uint64_t key =
-                  (blockers * rook_multiplies[sq.to_int()]) >> rook_shifts[sq.to_int()];
+                    (blockers * rook_multiplies[sq.to_int()]) >> rook_shifts[sq.to_int()];
                 rook_magics[sq.to_int()].ray_mask     = rays_bb;
                 rook_magics[sq.to_int()].magic        = rook_multiplies[sq.to_int()];
                 rook_magics[sq.to_int()].shift        = rook_shifts[sq.to_int()];
@@ -180,7 +180,7 @@ void init_bishop_attacks() {
 
                 // Update magic table.
                 std::uint64_t key =
-                  (blockers * bishop_multiplies[sq.to_int()]) >> bishop_shifts[sq.to_int()];
+                    (blockers * bishop_multiplies[sq.to_int()]) >> bishop_shifts[sq.to_int()];
                 bishop_magics[sq.to_int()].ray_mask     = rays_bb;
                 bishop_magics[sq.to_int()].magic        = bishop_multiplies[sq.to_int()];
                 bishop_magics[sq.to_int()].shift        = bishop_shifts[sq.to_int()];

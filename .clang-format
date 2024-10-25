@@ -24,7 +24,7 @@ BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: AfterColon
 BreakStringLiterals: false
 ColumnLimit: 100
-ContinuationIndentWidth: 2
+ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
 IndentGotoLabels: false
 IndentPPDirectives: BeforeHash
