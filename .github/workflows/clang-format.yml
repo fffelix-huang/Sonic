@@ -18,7 +18,7 @@ jobs:
 
       - name: Set up Clang
         run: |
-          sudo apt-get install -y clang-format
+          sudo apt-get install -y clang-format-16
 
       - name: Run clang-format Check on MediaProcessor
         run: |
